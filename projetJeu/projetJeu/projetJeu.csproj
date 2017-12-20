@@ -61,6 +61,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\ArrierePlan\spaceBackground.png" />
+    <Content Include="Content\Asteroides\RockAgSheet.png" />
+    <Content Include="Content\Asteroides\RockFeSheet.png" />
+    <Content Include="Content\Asteroides\RockMgSheet.png" />
+    <Content Include="Content\Vaisseau\shipLeft.png" />
+    <Content Include="Content\Vaisseau\shipRight.png" />
+    <Content Include="Content\Vaisseau\shipSprite.png" />
     <Content Include="Icon.ico" />
     <Content Include="Travail.txt" />
   </ItemGroup>
