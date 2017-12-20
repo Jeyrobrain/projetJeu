@@ -1,1 +1,9 @@
-Salut
+5 ennemi
+1joueur
+1boss
+
+enemmi echape des powerups
+	augment la vitesse de tir
+		3 type de powerup 
+
+systeme de points (avec temps, ennemie echape des points)
