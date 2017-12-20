@@ -83,6 +83,31 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Icon.ico" />
+    <Content Include="image\base3n.png" />
+    <Content Include="image\joueur\lightfighter0001.png" />
+    <Content Include="image\joueur\lightfighter0002.png" />
+    <Content Include="image\joueur\lightfighter0003.png" />
+    <Content Include="image\joueur\lightfighter0004.png" />
+    <Content Include="image\joueur\lightfighter0005.png" />
+    <Content Include="image\joueur\lightfighter0006.png" />
+    <Content Include="image\joueur\lightfighter0007.png" />
+    <Content Include="image\joueur\lightfighter0008.png" />
+    <Content Include="image\joueur\lightfighter0009.png" />
+    <Content Include="image\joueur\lightfighter0010.png" />
+    <Content Include="image\joueur\lightfighter0011.png" />
+    <Content Include="image\joueur\lightfighterNORM0001.png" />
+    <Content Include="image\joueur\lightfighterNORM0002.png" />
+    <Content Include="image\joueur\lightfighterNORM0003.png" />
+    <Content Include="image\joueur\lightfighterNORM0004.png" />
+    <Content Include="image\joueur\lightfighterNORM0005.png" />
+    <Content Include="image\joueur\lightfighterNORM0006.png" />
+    <Content Include="image\joueur\lightfighterNORM0007.png" />
+    <Content Include="image\joueur\lightfighterNORM0008.png" />
+    <Content Include="image\joueur\lightfighterNORM0009.png" />
+    <Content Include="image\joueur\lightfighterNORM0010.png" />
+    <Content Include="image\joueur\lightfighterNORM0011.png" />
+    <Content Include="image\moving-through-stars-in-space_-1zccenlb__F0000.png" />
+    <Content Include="image\WB_baseu3_d0.png" />
     <Content Include="Travail.txt" />
   </ItemGroup>
   <ItemGroup>
