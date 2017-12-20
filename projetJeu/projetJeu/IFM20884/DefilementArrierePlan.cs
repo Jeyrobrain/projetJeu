@@ -87,17 +87,17 @@ namespace IFM20884
         public override void Update(GameTime gameTime, GraphicsDeviceManager graphics)
         {
             // Calculer le décalage de l'arrière-plan vers le bas selon sa vitesse modulée.
-            float posY = Position.Y + (gameTime.ElapsedGameTime.Milliseconds * this.vitesseArrierePlan);
+            float posX = Position.X - (gameTime.ElapsedGameTime.Milliseconds * this.vitesseArrierePlan);
 
             // Si la texture n'est plus visible (i.e. passée sous l'écran), la ramener au haut de
             // l'écran afin de ne pas occasionner de gap dans le défilement de l'arrière plan.
-            if ((posY - (this.Height / 2)) > graphics.GraphicsDevice.Viewport.Height)
+            if ((posX + (this.Width / 2)) < graphics.GraphicsDevice.Viewport.Width)
             {
-                posY -= this.Height;
+                posX += this.Width;
             }
 
             // Décaler l'arrière plan.
-            this.Position = new Vector2(this.Position.X, posY);
+            this.Position = new Vector2(posX, this.Position.Y);
         }
 
         /// <summary>
@@ -110,11 +110,11 @@ namespace IFM20884
         {
             // La texture est affichée deux fois : une première fois au dessus de sa position
             // actuelle (ne pas oublier que le sprite est centrée sur _position).
-            this.Position = new Vector2(this.Position.X, this.Position.Y - Height);
+            this.Position = new Vector2(this.Position.X - this.Width, this.Position.Y);
             base.Draw(camera, spriteBatch);
 
             // Et une seconde fois à sa position actuelle
-            this.Position = new Vector2(this.Position.X, this.Position.Y + Height);
+            this.Position = new Vector2(this.Position.X + this.Width, this.Position.Y );
             base.Draw(camera, spriteBatch);
         }
     }

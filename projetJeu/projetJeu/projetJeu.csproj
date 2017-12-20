@@ -106,7 +106,9 @@
     <Content Include="image\joueur\lightfighterNORM0009.png" />
     <Content Include="image\joueur\lightfighterNORM0010.png" />
     <Content Include="image\joueur\lightfighterNORM0011.png" />
-    <Content Include="image\moving-through-stars-in-space_-1zccenlb__F0000.png" />
+    <Content Include="Content\ArrieresPlans\background.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="image\WB_baseu3_d0.png" />
     <Content Include="Travail.txt" />
   </ItemGroup>

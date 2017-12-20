@@ -84,7 +84,7 @@ namespace Exercice_5_2
         public static void LoadContent(ContentManager content, GraphicsDeviceManager graphics)
         {
             // Charger la texture d'arrière plan et la positionner au centre de l'écran
-            texture = content.Load<Texture2D>(@"ArrieresPlans\spaceBackground");
+            texture = content.Load<Texture2D>(@"ArrieresPlans\background");
         }
     }
 }
