@@ -13,30 +13,30 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin Menus/MainMenu.xml
-/copy:Menus/MainMenu.xml
+#begin Pipeline/Menus/MainMenu.xml
+/copy:Pipeline/Menus/MainMenu.xml
 
-#begin Polices/MainMenuPolice.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:TextureFormat=Compressed
-/build:Polices/MainMenuPolice.spritefont
-
-#begin Songs/scifi072.wav
+#begin Pipeline/Songs/scifi072.wav
 /importer:WavImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:Songs/scifi072.wav
+/build:Pipeline/Songs/scifi072.wav
 
-#begin SoundFX/misc291.wav
+#begin Pipeline/SoundFX/misc291.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
-/build:SoundFX/misc291.wav
+/build:Pipeline/SoundFX/misc291.wav
 
-#begin SoundFX\menuitem_change
+#begin Pipeline/SoundFX/menuitem_change.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
-/build:SoundFX\menuitem_change
+/build:Pipeline/SoundFX/menuitem_change.wav
+
+#begin Pipeline/Polices/MainMenuPolice.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Pipeline/Polices/MainMenuPolice.spritefont
 

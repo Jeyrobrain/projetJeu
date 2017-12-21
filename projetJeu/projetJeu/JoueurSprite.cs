@@ -186,7 +186,7 @@ namespace projetJeu
             vaisseauDroite = content.Load<Texture2D>(@"Vaisseau\shipRight");
 
             // Charger le bruitage des moteurs.
-            moteurs = content.Load<SoundEffect>(@"SoundFX\misc291");
+            moteurs = content.Load<SoundEffect>(@"Pipeline\SoundFX\misc291");
         }
 
         /// <summary>

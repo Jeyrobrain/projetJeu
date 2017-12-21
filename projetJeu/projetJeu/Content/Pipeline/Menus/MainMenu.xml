@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Menu>
+  <MenuNom>MainMenu</MenuNom>
+  <MenuTitre>Jdois sauver ma femme!!</MenuTitre>
+  <MenuItem>
+    <MenuItemNom>Commencer</MenuItemNom>
+    <MenuItemTitre>Commencer</MenuItemTitre>
+    <MenuItemIndent>95</MenuItemIndent>
+  </MenuItem>
+  <MenuItem>
+    <MenuItemNom>Quitter</MenuItemNom>
+    <MenuItemTitre>Quitter</MenuItemTitre>
+    <MenuItemIndent>115</MenuItemIndent>
+  </MenuItem>
+  <PositionX>225</PositionX>
+  <PositionY>175</PositionY>
+  <IndexSelectionItem>1</IndexSelectionItem>
+</Menu>

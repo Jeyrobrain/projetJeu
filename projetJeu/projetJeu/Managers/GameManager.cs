@@ -168,7 +168,7 @@ namespace projetJeu.Managers
             this.arrierePlanEspace = new ArrierePlanEspace(this.graphics);
 
             // Charger le bruitage de fond du jeu.
-            this.bruitageFond = this.game.Content.Load<Song>(@"Songs\scifi072");
+            this.bruitageFond = this.game.Content.Load<Song>(@"Pipeline\Songs\scifi072");
 
             this.mainmenuImage = this.game.Content.Load<Texture2D>(@"ArrieresPlans\mainmenu.jpg");
 

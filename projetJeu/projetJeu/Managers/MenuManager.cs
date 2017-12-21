@@ -53,12 +53,12 @@ namespace projetJeu.Managers
             Menu.LoadContent(this.gameManager.GetContent());
 
             // Charger les polices.
-            this.policeMenuTitre = this.gameManager.GetContent().Load<SpriteFont>(@"Polices\MainMenuPolice");
-            this.policeMenuItem = this.gameManager.GetContent().Load<SpriteFont>(@"Polices\MainMenuPolice");
+            this.policeMenuTitre = this.gameManager.GetContent().Load<SpriteFont>(@"Pipeline\Polices\MainMenuPolice");
+            this.policeMenuItem = this.gameManager.GetContent().Load<SpriteFont>(@"Pipeline\Polices\MainMenuPolice");
 
             // Charger tous les menus disponibles et les stocker dans la liste des menus.
             // Obtenir d’abord une liste des fichiers XML de définition de menu.
-            string[] fichiersDeMenu = Directory.GetFiles(this.gameManager.GetContent().RootDirectory + @"\Menus\");
+            string[] fichiersDeMenu = Directory.GetFiles(this.gameManager.GetContent().RootDirectory + @"\Pipeline\Menus\");
             // Itérer pour chaque fichier XML trouvé.
             foreach (string nomFichier in fichiersDeMenu)
             {
