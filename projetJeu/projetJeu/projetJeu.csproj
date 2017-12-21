@@ -39,9 +39,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ArrierePlanEspace.cs" />
-    <Compile Include="AsteroideSprite.cs" />
     <Compile Include="ClavierService.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="GameManager.cs" />
     <Compile Include="JoueurSprite.cs" />
     <Compile Include="IFM20884\Camera.cs" />
     <Compile Include="IFM20884\DefilementArrierePlan.cs" />
@@ -50,6 +50,7 @@
     <Compile Include="IFM20884\ServiceHelper.cs" />
     <Compile Include="IFM20884\Sprite.cs" />
     <Compile Include="IFM20884\SpriteAnimation.cs" />
+    <Compile Include="ManetteService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -61,16 +62,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\ArrieresPlans\spaceBackground.png">
+    <Content Include="Content\ArrieresPlans\seamless-space-blue.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Asteroides\RockAgSheet.png">
+    <Content Include="Content\ArrieresPlans\seamless-space-orange.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Asteroides\RockFeSheet.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Asteroides\RockMgSheet.png">
+    <Content Include="Content\ArrieresPlans\seamless-space-purple.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Vaisseau\shipLeft.png">
@@ -106,9 +104,6 @@
     <Content Include="image\joueur\lightfighterNORM0009.png" />
     <Content Include="image\joueur\lightfighterNORM0010.png" />
     <Content Include="image\joueur\lightfighterNORM0011.png" />
-    <Content Include="Content\ArrieresPlans\background.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="image\WB_baseu3_d0.png" />
     <Content Include="Travail.txt" />
   </ItemGroup>

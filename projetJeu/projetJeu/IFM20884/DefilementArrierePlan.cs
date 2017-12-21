@@ -63,8 +63,8 @@ namespace IFM20884
         /// </summary>
         /// <param name="graphics">Gestionnaire de périphérique d'affichage.</param>
         public DefilementArrierePlan(GraphicsDeviceManager graphics)
-            : base(graphics.GraphicsDevice.Viewport.Width / 2f, graphics.GraphicsDevice.Viewport.Height / 2f) 
-        { 
+            : base(graphics.GraphicsDevice.Viewport.Width / 2f, graphics.GraphicsDevice.Viewport.Height / 2f)
+        {
         }
 
         /// <summary>
@@ -110,11 +110,11 @@ namespace IFM20884
         {
             // La texture est affichée deux fois : une première fois au dessus de sa position
             // actuelle (ne pas oublier que le sprite est centrée sur _position).
-            this.Position = new Vector2(this.Position.X - this.Width, this.Position.Y);
+            this.Position = new Vector2(this.Position.X - Width, this.Position.Y);
             base.Draw(camera, spriteBatch);
 
             // Et une seconde fois à sa position actuelle
-            this.Position = new Vector2(this.Position.X + this.Width, this.Position.Y );
+            this.Position = new Vector2(this.Position.X + Width, this.Position.Y);
             base.Draw(camera, spriteBatch);
         }
     }

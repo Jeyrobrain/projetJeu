@@ -43,51 +43,14 @@ namespace projetJeu
     using Microsoft.Xna.Framework;
     using Microsoft.Xna.Framework.Graphics;
     using Microsoft.Xna.Framework.Input;
+    using Microsoft.Xna.Framework.Media;
 
     /// <summary>
     /// Classe principale du jeu.
     /// </summary>
     public class Game : Microsoft.Xna.Framework.Game
     {
-        /// <summary>
-        /// Attribut permettant d'obtenir des infos sur la carte graphique et l'écran.
-        /// </summary>
-        private GraphicsDeviceManager graphics;
-
-        /// <summary>
-        /// Attribut gérant l'affichage en batch à l'écran.
-        /// </summary>
-        private SpriteBatch spriteBatch;
-
-        /// <summary>
-        /// Attribut représentant le vaisseau contrôlé par le joueur.
-        /// </summary>
-        private JoueurSprite vaisseauJoueur;
-
-        /// <summary>
-        /// Attribut représentant l'arrière plan à défilement vertical du du jeu.
-        /// </summary>
-        private DefilementArrierePlan arrierePlan;
-
-        /// <summary>
-        /// Attribut représentant la camera.
-        /// </summary>
-        private Camera camera;
-
-        /// <summary>
-        /// Liste des sprites représentant des astéroïdes.
-        /// </summary>
-        private List<Sprite> listeAsteroides;
-
-        /// <summary>
-        /// Générateur de nombres aléatoires pour générer des astéroïdes.
-        /// </summary>
-        private Random randomAsteroides;
-
-        /// <summary>
-        /// Probabilité de générer un astéroïde par cycle de Update().
-        /// </summary>
-        private float probAsteroides;
+        private GameManager gameManager;
 
         /// <summary>
         /// Constructeur par défaut de la classe. Cette classe est générée automatiquement
@@ -95,8 +58,7 @@ namespace projetJeu
         /// </summary>
         public Game()
         {
-            this.graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
+            gameManager = new GameManager(this);
         }
 
         /// <summary>
@@ -107,18 +69,7 @@ namespace projetJeu
         /// </summary>
         protected override void Initialize()
         {
-            // Activer le service de gestion du clavier
-            ServiceHelper.Game = this;
-            this.Components.Add(new ClavierService(this));
-
-            // Initialiser la vue de la caméra à la taille de l'écran.
-            this.camera = new Camera(new Rectangle(0, 0, this.graphics.GraphicsDevice.Viewport.Width, this.graphics.GraphicsDevice.Viewport.Height));
-
-            // Créer les attributs de gestion des astéroïdes.
-            this.listeAsteroides = new List<Sprite>();
-            this.randomAsteroides = new Random();
-            this.probAsteroides = 0.01f;
-
+            gameManager.Initialize();
             base.Initialize();
         }
 
@@ -128,21 +79,7 @@ namespace projetJeu
         /// </summary>
         protected override void LoadContent()
         {
-            // Créer un nouveau SpriteBatch, utilisée pour dessiner les textures.
-            this.spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            // Charger les sprites.
-            JoueurSprite.LoadContent(this.Content, this.graphics);
-            ArrierePlanEspace.LoadContent(this.Content, this.graphics);
-            AsteroideSprite.LoadContent(this.Content, this.graphics);
-
-            // Créer les sprites du jeu. Premièrement le sprite du joueur centrer au bas de l'écran. On limite ensuite
-            // ses déplacements à l'écran.
-            this.vaisseauJoueur = new JoueurSprite(this.graphics.GraphicsDevice.Viewport.Width / 2f, this.graphics.GraphicsDevice.Viewport.Height * 0.85f);
-            this.vaisseauJoueur.BoundsRect = new Rectangle(0, 0, this.graphics.GraphicsDevice.Viewport.Width, this.graphics.GraphicsDevice.Viewport.Height);
-
-            // Créer ensuite le sprite représentant l'arrière-plan.
-            this.arrierePlan = new ArrierePlanEspace(this.graphics);
+            gameManager.LoadContent();
         }
 
         /// <summary>
@@ -162,64 +99,7 @@ namespace projetJeu
         /// <param name="gameTime">Fournie un instantané du temps de jeu.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Permettre de quitter le jeu via le service d'input.
-            if (ServiceHelper.Get<IInputService>().Quitter(1))
-            {
-                this.Exit();
-            }
-
-            // Mettre à joueur les sprites du jeu
-            this.vaisseauJoueur.Update(gameTime, this.graphics);
-            this.arrierePlan.Update(gameTime, this.graphics);
-
-            // Identifier les astéroïdes ayant quitté l'écran.
-            List<AsteroideSprite> asteroidesFini = new List<AsteroideSprite>();
-            foreach (AsteroideSprite asteroide in this.listeAsteroides)
-            {
-                if (this.camera.EstAuDessus(asteroide.PositionRect))
-                {
-                    asteroidesFini.Add(asteroide);
-                }
-            }
-
-            // Se débarasser des astéroïdes ayant quitté l'écran.
-            foreach (AsteroideSprite asteroide in asteroidesFini)
-            {
-                this.listeAsteroides.Remove(asteroide);
-            }
-
-            // Mettre à jour les astéroïdes existants.
-            foreach (AsteroideSprite asteroide in this.listeAsteroides)
-            {
-                asteroide.Update(gameTime, this.graphics);
-            }
-
-            // Déterminer si on doit créer un nouvel astéroide.
-            if (this.randomAsteroides.NextDouble() < this.probAsteroides)
-            {
-                // Créer le sprite
-                AsteroideSprite asteriode = new AsteroideSprite(0, 0);
-
-                // Positionner aléatoirement le sprite au haut de l'écran.
-                Random random = new Random();
-                asteriode.Position = new Vector2(random.Next(this.graphics.GraphicsDevice.Viewport.Width), -asteriode.Height / 2);
-
-                // Aligner la vitesse de déplacement de l'astéroïde avec celui de l'arrière-plan.
-                asteriode.VitesseDeplacement = this.arrierePlan.VitesseArrierePlan;
-
-                // Ajouter le sprite à la liste d'astéroïdes.
-                this.listeAsteroides.Add(asteriode);
-            }
-
-            // Déterminer si le sprite du joueur est entré en collision avec un astéroide
-            foreach (AsteroideSprite asteroide in this.listeAsteroides)
-            {
-                if (this.vaisseauJoueur.Collision(asteroide))
-                {
-                    this.Exit();
-                }
-            }
-
+            gameManager.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -230,23 +110,7 @@ namespace projetJeu
         /// <param name="gameTime">Fournie un instantané du temps de jeu.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // À FAIRE: Ajoutez votre code d'affichage ici.
-            this.spriteBatch.Begin();
-
-            // Afficher l'arrière-plan.
-            this.arrierePlan.Draw(this.camera, this.spriteBatch);
-            this.vaisseauJoueur.Draw(this.camera, this.spriteBatch);
-
-            // Afficher les astéroïdes.
-            foreach (AsteroideSprite asteroide in this.listeAsteroides)
-            {
-                asteroide.Draw(this.camera, this.spriteBatch);
-            }
-
-            this.spriteBatch.End();
-
+            gameManager.Draw(gameTime);
             base.Draw(gameTime);
         }
     }

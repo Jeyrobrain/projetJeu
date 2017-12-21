@@ -84,7 +84,7 @@ namespace projetJeu
         public static void LoadContent(ContentManager content, GraphicsDeviceManager graphics)
         {
             // Charger la texture d'arrière plan et la positionner au centre de l'écran
-            texture = content.Load<Texture2D>(@"ArrieresPlans\background");
+            texture = content.Load<Texture2D>(@"ArrieresPlans\seamless-space-blue");
         }
     }
 }

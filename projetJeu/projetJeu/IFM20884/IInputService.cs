@@ -87,5 +87,19 @@ namespace IFM20884
         /// <param name="device">Le périphérique à lire.</param>
         /// <returns>Valeurs entre 0.0 (aucun mouvement) et 1.0 (vitesse maximale).</returns>
         bool Quitter(int device);                 // pour quitter la partie
+
+        /// <summary>
+        /// Retourne un booléen indiquant si le sprite doit sauter.
+        /// </summary>
+        /// <param name="device">Le périphérique à lire.</param>
+        /// <returns>Vrai si le sprite doit sauter; faux sinon.</returns>
+        bool Sauter(int device);
+
+        /// <summary>
+        /// Indique si la partie doit être temporairement suspendue.
+        /// </summary>
+        /// <param name="device">Le périphérique à lire.</param>
+        /// <returns>Vrai si la partie doit être suspendue; faux sinon.</returns>
+        bool Pause(int device);
     }
 }

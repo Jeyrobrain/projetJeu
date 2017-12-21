@@ -81,8 +81,8 @@ namespace IFM20884
         /// </summary>
         /// <param name="position">Coordonnées initiales horizontale et verticale du sprite.</param>
         public Sprite(Vector2 position)
-            : this(position.X, position.Y) 
-        { 
+            : this(position.X, position.Y)
+        {
         }
 
         /// <summary>
@@ -101,9 +101,9 @@ namespace IFM20884
         /// </summary>
         public Vector2 Position             // accesseur pour position
         {
-            get 
+            get
             {
-                return this.position; 
+                return this.position;
             }
 
             // Le setter s'assure que la nouvelle position n'excède pas les bornes de mouvements
@@ -124,9 +124,9 @@ namespace IFM20884
         /// </summary>
         public Rectangle BoundsRect          // accesseur pour boundsRect
         {
-            get 
+            get
             {
-                return this.boundsRect; 
+                return this.boundsRect;
             }
 
             // Le setter s'assurer que la position courante est confinée au nouvelles bornes.

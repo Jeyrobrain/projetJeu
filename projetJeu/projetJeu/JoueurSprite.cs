@@ -42,6 +42,7 @@ namespace projetJeu
     using IFM20884;
 
     using Microsoft.Xna.Framework;
+    using Microsoft.Xna.Framework.Audio;
     using Microsoft.Xna.Framework.Content;
     using Microsoft.Xna.Framework.Graphics;
     using Microsoft.Xna.Framework.Input;
@@ -54,6 +55,11 @@ namespace projetJeu
     /// </summary>
     public class JoueurSprite : Sprite
     {
+        /// <summary>
+        /// Effet sonore contenant le bruitage des moteurs.
+        /// </summary>
+        private static SoundEffect moteurs;
+
         /// <summary>
         /// Attribut statique contenant la texture du vaisseau lorsqu'il se déplace vers l'avant.
         /// </summary>
@@ -97,6 +103,11 @@ namespace projetJeu
         private int indexPeripherique = 1;
 
         /// <summary>
+        /// Instance de bruitage des moteurs en cours de sonorisation durant le jeu.
+        /// </summary>
+        private SoundEffectInstance moteursActif;
+
+        /// <summary>
         /// Constructeur paramétré recevant la position du sprite.
         /// </summary>
         /// <param name="x">Coordonnée initiale x (horizontale) du sprite.</param>
@@ -105,6 +116,11 @@ namespace projetJeu
             : base(x, y)
         {
             this.vaisseau = vaisseauAvant;  // par défaut, c'est le vaisseau avant qui est affiché
+
+            // Sélectionner et paramétrer le bruitage de fond.
+            this.moteursActif = moteurs.CreateInstance();
+            this.moteursActif.Volume = 0.0f;
+            this.moteursActif.IsLooped = true;
         }
 
         /// <summary>
@@ -168,6 +184,9 @@ namespace projetJeu
             vaisseauAvant = content.Load<Texture2D>(@"Vaisseau\shipSprite");
             vaisseauGauche = content.Load<Texture2D>(@"Vaisseau\shipLeft");
             vaisseauDroite = content.Load<Texture2D>(@"Vaisseau\shipRight");
+
+            // Charger le bruitage des moteurs.
+            moteurs = content.Load<SoundEffect>(@"SoundFX\misc291");
         }
 
         /// <summary>
@@ -201,7 +220,7 @@ namespace projetJeu
                 this.vaisseau = vaisseauAvant;
 
                 // Décélération latérale au besoin
-                if (Math.Abs(this.vitesseLaterale) >= FacteurAcceleration)       
+                if (Math.Abs(this.vitesseLaterale) >= FacteurAcceleration)
                 {
                     this.vitesseLaterale -= Math.Sign(this.vitesseLaterale) * FacteurAcceleration;
                 }
@@ -225,7 +244,7 @@ namespace projetJeu
             else
             {
                 // Décélération frontale au besoin
-                if (Math.Abs(this.vitesseFrontale) >= FacteurAcceleration)       
+                if (Math.Abs(this.vitesseFrontale) >= FacteurAcceleration)
                 {
                     this.vitesseFrontale -= Math.Sign(this.vitesseFrontale) * FacteurAcceleration;
                 }
@@ -235,10 +254,58 @@ namespace projetJeu
                 }
             }
 
+            // Activer les effets sonores associés aux moteurs lorsque ceux-ci sont actifs.
+            if (this.vitesseFrontale != 0.0f || this.vitesseLaterale != 0.0f)
+            {
+                if (this.moteursActif.State != SoundState.Playing)
+                {
+                    this.moteursActif.Play();
+                }
+            }
+            else
+            {
+                if (this.moteursActif.State != SoundState.Paused)
+                {
+                    this.moteursActif.Pause();
+                }
+            }
+
+            // Si l'effet sonore associé aux moteurs est actif, ajuster le volume
+            // en fonction de la vitesse de réplacement (le volume est ainsi
+            // relatif aux accélérations et décélérations).
+            if (this.moteursActif.State == SoundState.Playing)
+            {
+                this.moteursActif.Volume = Math.Max(Math.Abs(this.vitesseFrontale), Math.Abs(this.vitesseLaterale)) / VitesseMaximale;
+            }
+
             // Déplacer le vaisseau en fonction des vitesses latérales et frontales
             this.Position = new Vector2(
                 this.Position.X + (gameTime.ElapsedGameTime.Milliseconds * this.vitesseLaterale),
                 this.Position.Y + (gameTime.ElapsedGameTime.Milliseconds * this.vitesseFrontale));
+        }
+
+        /// <summary>
+        /// Suspend temporairement (pause) ou réactive les effets sonores du vaisseau.
+        /// </summary>
+        /// <param name="suspendre">Indique si les effets sonores doivent être suspendus ou réactivés.</param>
+        public void SuspendreEffetsSonores(bool suspendre)
+        {
+            if (suspendre)
+            {
+                // Suspendre au besoin les effets sonores associés aux moteurs
+                if (this.moteursActif.State == SoundState.Playing)
+                {
+                    this.moteursActif.Pause();
+                }
+            }
+            else
+            {
+                // Réactiver au besoin les effets sonores associés aux moteurs
+                if (this.moteursActif.State == SoundState.Paused)
+                {
+                    this.moteursActif.Play();
+                }
+            }
         }
     }
 }

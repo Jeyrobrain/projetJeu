@@ -77,8 +77,8 @@ namespace IFM20884
         /// </summary>
         /// <param name="camera">Rectangle des coordonnées de la caméra.</param>
         public Camera(Rectangle camera)
-            : this(camera, camera) 
-        { 
+            : this(camera, camera)
+        {
         }
 
         /// <summary>
@@ -221,7 +221,7 @@ namespace IFM20884
             {
                 this.cameraRect.Offset(0, this.MondeRect.Top - this.CameraRect.Top);
             }
- 
+
             // Restreindre en fonction du coin inférieur droit du monde.
             if (this.cameraRect.Right > this.mondeRect.Right)
             {
