@@ -1,6 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using IFM20884;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using projetJeu.Menus;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -53,8 +53,8 @@ namespace projetJeu.Managers
             Menu.LoadContent(this.gameManager.GetContent());
 
             // Charger les polices.
-            this.policeMenuTitre = this.gameManager.GetContent().Load<SpriteFont>(@"Polices\MainMenuFont");
-            this.policeMenuItem = this.gameManager.GetContent().Load<SpriteFont>(@"Polices\MainMenuFont");
+            this.policeMenuTitre = this.gameManager.GetContent().Load<SpriteFont>(@"Polices\MainMenuPolice");
+            this.policeMenuItem = this.gameManager.GetContent().Load<SpriteFont>(@"Polices\MainMenuPolice");
 
             // Charger tous les menus disponibles et les stocker dans la liste des menus.
             // Obtenir d’abord une liste des fichiers XML de définition de menu.

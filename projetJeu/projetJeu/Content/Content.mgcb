@@ -13,11 +13,14 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin SoundFX/misc291.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:SoundFX/misc291.wav
+#begin Menus/MainMenu.xml
+/copy:Menus/MainMenu.xml
+
+#begin Polices/MainMenuPolice.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Polices/MainMenuPolice.spritefont
 
 #begin Songs/scifi072.wav
 /importer:WavImporter
@@ -25,18 +28,15 @@
 /processorParam:Quality=Best
 /build:Songs/scifi072.wav
 
-#begin Menus/MainMenu.xml
-/copy:Menus/MainMenu.xml
-
-#begin Polices/MainMenuFont.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:TextureFormat=Compressed
-/build:Polices/MainMenuFont.spritefont
-
-#begin SoundFX/menuitem_change.wav
+#begin SoundFX/misc291.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
-/build:SoundFX/menuitem_change.wav
+/build:SoundFX/misc291.wav
+
+#begin SoundFX\menuitem_change
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:SoundFX\menuitem_change
 
