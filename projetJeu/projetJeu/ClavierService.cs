@@ -275,5 +275,20 @@ namespace projetJeu
                 return false;
             }
         }
+
+        public bool MenuItemSuivant(int device)
+        {
+            return this.etatClavier.IsKeyDown(Keys.Down);
+        }
+
+        public bool MenuItemPrecedent(int device)
+        {
+            return this.etatClavier.IsKeyDown(Keys.Up);
+        }
+
+        public bool MenuItemSelection(int device)
+        {
+            return this.etatClavier.IsKeyDown(Keys.Enter);
+        }
     }
 }

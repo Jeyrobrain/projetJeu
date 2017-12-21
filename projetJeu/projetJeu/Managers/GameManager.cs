@@ -1,5 +1,6 @@
 ﻿using IFM20884;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
 using System;
@@ -8,13 +9,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace projetJeu
+namespace projetJeu.Managers
 {
-    class GameManager
+    public class GameManager
     {
         private Game game;
 
+        private MenuManager menuManager;
+
         private GraphicsDeviceManager graphics;
+
+        Texture2D mainmenuImage;
 
         /// <summary>
         /// Attribut gérant l'affichage en batch à l'écran.
@@ -25,16 +30,6 @@ namespace projetJeu
         /// Attribut représentant la camera.
         /// </summary>
         private Camera camera;
-
-        /// <summary>
-        /// Liste des sprites représentant des astéroïdes.
-        /// </summary>
-        private List<Sprite> listeAsteroides;
-
-        /// <summary>
-        /// Générateur de nombres aléatoires pour générer des astéroïdes.
-        /// </summary>
-        private Random randomAsteroides;
 
         /// <summary>
         /// États disponibles du jeu.
@@ -78,8 +73,8 @@ namespace projetJeu
         /// <value>État courant du jeu.</value>
         public Etats EtatJeu
         {
-            get { return this.etatJeu; }
-            set { this.etatJeu = value; }
+            get { return etatJeu; }
+            set { etatJeu = value; }
         }
 
         /// <summary>
@@ -90,22 +85,47 @@ namespace projetJeu
         /// <summary>
         /// Effet sonore contenant le bruitage de fond du jeu.
         /// </summary>
-        private static Song bruitageFond;
+        private Song bruitageFond;
 
         /// <summary>
         /// Attribut représentant l'arrière plan d'étoiles à défilement vertical du du jeu.
         /// </summary>
         private DefilementArrierePlan arrierePlanEspace;
 
-        public GameManager(Game game)
+        private Texture2D _faderTexture;
+        private float _faderAlpha;
+        private float _faderAlphaIncrement = 10;
+        private bool fading;
+        private bool switchScenes;
+
+
+
+
+
+        public GameManager(Game _game)
         {
-            this.game = game;
+            this.game = _game;
             this.graphics = new GraphicsDeviceManager(game);
-            game.Content.RootDirectory = "Content";
+            this.game.Content.RootDirectory = "Content";
+        }
+
+        public ContentManager GetContent()
+        {
+            return game.Content;
+        }
+
+        public void Exit()
+        {
+            this.game.Exit();
         }
 
         public void Initialize()
         {
+            _faderTexture = new Texture2D(graphics.GraphicsDevice, 1, 1);
+            var colors = new Color[] { Color.White };
+            _faderTexture.SetData<Color>(colors);
+            this.menuManager = new MenuManager(this);
+
             // Ajust le nom du jeu
             this.game.Window.Title = "projetJeu";
 
@@ -115,15 +135,11 @@ namespace projetJeu
             this.graphics.ApplyChanges();
 
             // Activer le service de gestion du clavier
-            ServiceHelper.Game = game;
-            this.game.Components.Add(new ClavierService(game));
+            ServiceHelper.Game = this.game;
+            this.game.Components.Add(new ClavierService(this.game));
 
             // Initialiser la vue de la caméra à la taille de l'écran.
             this.camera = new Camera(new Rectangle(0, 0, this.graphics.GraphicsDevice.Viewport.Width, this.graphics.GraphicsDevice.Viewport.Height));
-
-            // Créer les attributs de gestion des astéroïdes.
-            this.listeAsteroides = new List<Sprite>();
-            this.randomAsteroides = new Random();
 
             // Le jeu est en cours de démarrage. Notez qu'on évite d'exploiter la prorpiété EtatJeu
             // car le setter de cette dernière manipule des effets sonores qui ne sont pas encore
@@ -133,6 +149,9 @@ namespace projetJeu
 
         public void LoadContent()
         {
+            this.menuManager.LoadContent();
+            this.menuManager.MenuCourant = this.menuManager.TrouverMenu("MainMenu");
+
             // Créer un nouveau SpriteBatch, utilisée pour dessiner les textures.
             this.spriteBatch = new SpriteBatch(this.graphics.GraphicsDevice);
 
@@ -142,51 +161,89 @@ namespace projetJeu
 
             // Créer les sprites du jeu. Premièrement le sprite du joueur centrer au bas de l'écran. On limite ensuite
             // ses déplacements à l'écran.
-            this.vaisseauJoueur = new JoueurSprite(this.graphics.GraphicsDevice.Viewport.Width / 2f, this.graphics.GraphicsDevice.Viewport.Height * 0.85f);
+            this.vaisseauJoueur = new JoueurSprite(this.graphics.GraphicsDevice.Viewport.Width / 8f, this.graphics.GraphicsDevice.Viewport.Height / 2f);
             this.vaisseauJoueur.BoundsRect = new Rectangle(0, 0, this.graphics.GraphicsDevice.Viewport.Width, this.graphics.GraphicsDevice.Viewport.Height);
 
             // Créer ensuite les sprites représentant les arrière-plans.
             this.arrierePlanEspace = new ArrierePlanEspace(this.graphics);
 
             // Charger le bruitage de fond du jeu.
-            bruitageFond = game.Content.Load<Song>(@"Songs\scifi072");
+            this.bruitageFond = this.game.Content.Load<Song>(@"Songs\scifi072");
+
+            this.mainmenuImage = this.game.Content.Load<Texture2D>(@"ArrieresPlans\mainmenu.jpg");
 
             // Paramétrer la musique de fond et la démarrer.
             MediaPlayer.Volume = 0.5f;         // pour mieux entendre les autres effets sonores
             MediaPlayer.IsRepeating = true;
-
             MediaPlayer.Play(bruitageFond);
+            MediaPlayer.Pause();
         }
 
         public void Update(GameTime gameTime)
         {
-            // Si le jeu est en cours de démarrage, passer à l'état de jouer
+            if (fading)
+            {
+                _faderAlpha += _faderAlphaIncrement;
+
+                // Lighting things back!
+                if (_faderAlpha >= 255)
+                {
+                    switchScenes = true;
+                    _faderAlphaIncrement = -_faderAlphaIncrement;
+                }
+                else if (_faderAlpha <= 0)
+                {
+                    fading = false;
+                }
+            }
+
             if (this.EtatJeu == Etats.Demarrer)
             {
-                this.EtatJeu = Etats.Jouer;
+                if (!fading)
+                {
+                    this.menuManager.MenuCourant.GetInput(gameTime);
+                }
+                else
+                {
+                    if (switchScenes)
+                    {
+                        this.EtatJeu = Etats.Jouer;
+                    }
+                }
             }
-
-            // Permettre de quitter le jeu via le service d'input.
-            if (ServiceHelper.Get<IInputService>().Quitter(1))
+            else if (this.EtatJeu == Etats.Jouer || this.EtatJeu == Etats.Pause)
             {
-                this.game.Exit();
-            }
+                if (!fading)
+                {
+                    if (switchScenes)
+                    {
+                        switchScenes = false;
+                        SuspendreEffetsSonores(false);
+                    }
+                    // Permettre de quitter le jeu via le service d'input.
+                    if (ServiceHelper.Get<IInputService>().Quitter(1))
+                    {
+                        this.game.Exit();
+                        Environment.Exit(0);
+                    }
 
-            // Est-ce que le bouton de pause a été pressé?
-            if (ServiceHelper.Get<IInputService>().Pause(1))
-            {
-                this.Pause = !this.Pause;
-            }
+                    // Est-ce que le bouton de pause a été pressé?
+                    if (ServiceHelper.Get<IInputService>().Pause(1))
+                    {
+                        this.Pause = !Pause;
+                    }
 
-            // Si le jeu est en pause, interrompre la mise à jour
-            if (this.Pause)
-            {
-                return;
-            }
+                    // Si le jeu est en pause, interrompre la mise à jour
+                    if (Pause)
+                    {
+                        return;
+                    }
 
-            // Mettre à joueur les sprites du jeu
-            this.vaisseauJoueur.Update(gameTime, this.graphics);
-            this.arrierePlanEspace.Update(gameTime, this.graphics);
+                    // Mettre à joueur les sprites du jeu
+                    this.vaisseauJoueur.Update(gameTime, this.graphics);
+                    this.arrierePlanEspace.Update(gameTime, this.graphics);
+                }
+            }
         }
 
         public void Draw(GameTime gameTime)
@@ -196,11 +253,24 @@ namespace projetJeu
             // À FAIRE: Ajoutez votre code d'affichage ici.
             this.spriteBatch.Begin();
 
-            // Afficher l'arrière-plan.
-            this.arrierePlanEspace.Draw(this.camera, this.spriteBatch);
+            if (EtatJeu == Etats.Demarrer)
+            {
+                this.spriteBatch.Draw(mainmenuImage, graphics.GraphicsDevice.Viewport.Bounds, Color.White);
+                this.menuManager.Draw(spriteBatch);
+            }
+            else if (EtatJeu == Etats.Jouer || this.EtatJeu == Etats.Pause)
+            {
+                // Afficher l'arrière-plan.
+                this.arrierePlanEspace.Draw(this.camera, this.spriteBatch);
 
-            // Afficher le sprite contrôlé par le joueur.
-            this.vaisseauJoueur.Draw(this.camera, this.spriteBatch);
+                // Afficher le sprite contrôlé par le joueur.
+                this.vaisseauJoueur.Draw(this.camera, this.spriteBatch);
+            }
+
+            if (fading)
+            {
+                spriteBatch.Draw(_faderTexture, graphics.GraphicsDevice.Viewport.Bounds, new Color(Color.Black, (byte)MathHelper.Clamp(_faderAlpha, 0, 255)));
+            }
 
             this.spriteBatch.End();
         }
@@ -234,7 +304,7 @@ namespace projetJeu
                 }
 
                 // Suspendre les effets sonores au besoin
-                this.SuspendreEffetsSonores(this.Pause);
+                this.SuspendreEffetsSonores(Pause);
             }
         }
 
@@ -242,7 +312,7 @@ namespace projetJeu
         /// Suspend temporairement (pause) ou réactive les effets sonores du jeu.
         /// </summary>
         /// <param name="suspendre">Indique si les effets sonores doivent être suspendus ou réactivés.</param>
-        protected void SuspendreEffetsSonores(bool suspendre)
+        public void SuspendreEffetsSonores(bool suspendre)
         {
             // Suspendre au besoin les effets sonores du vaisseau
             this.vaisseauJoueur.SuspendreEffetsSonores(suspendre);
@@ -259,9 +329,14 @@ namespace projetJeu
             {
                 if (MediaPlayer.State == MediaState.Paused)
                 {
-                    MediaPlayer.Play(bruitageFond);
+                    MediaPlayer.Resume();
                 }
             }
+        }
+
+        public void FadeOut()
+        {
+            fading = true;
         }
     }
 }

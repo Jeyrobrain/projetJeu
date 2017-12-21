@@ -101,5 +101,12 @@ namespace IFM20884
         /// <param name="device">Le périphérique à lire.</param>
         /// <returns>Vrai si la partie doit être suspendue; faux sinon.</returns>
         bool Pause(int device);
+
+        // Indique si l'item de menu suivant doit être activé pour sélection.
+        bool MenuItemSuivant(int device);
+        // Indique si l'item de menu précédent doit être activé pour sélection.
+        bool MenuItemPrecedent(int device);
+        // Indique si l'item de menu présentement activé doit être sélectionné.
+        bool MenuItemSelection(int device);
     }
 }

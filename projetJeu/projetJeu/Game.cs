@@ -39,6 +39,7 @@ namespace projetJeu
     using System.Linq;
 
     using IFM20884;
+    using Managers;
 
     using Microsoft.Xna.Framework;
     using Microsoft.Xna.Framework.Graphics;

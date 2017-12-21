@@ -25,3 +25,18 @@
 /processorParam:Quality=Best
 /build:Songs/scifi072.wav
 
+#begin Menus/MainMenu.xml
+/copy:Menus/MainMenu.xml
+
+#begin Polices/MainMenuFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Polices/MainMenuFont.spritefont
+
+#begin SoundFX/menuitem_change.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:SoundFX/menuitem_change.wav
+

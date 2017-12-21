@@ -199,7 +199,7 @@ namespace projetJeu
         public override void Update(GameTime gameTime, GraphicsDeviceManager graphics)
         {
             const float FacteurAcceleration = 0.02f;     // facteur d'accélération et de décélération
-            const float VitesseMaximale = 0.5f;          // vitesse latérale et frontale maximale
+            const float VitesseMaximale = 0.4f;          // vitesse latérale et frontale maximale
 
             // Changer le vaisseau affiché et ajuster sa position horizontale selon la touche pressée
             // (en tenant compte de l'accélération / décélération)
@@ -207,12 +207,10 @@ namespace projetJeu
                                   ServiceHelper.Get<IInputService>().DeplacementGauche(this.IndexPeripherique);
             if (facteurInputs < 0.0f)
             {
-                this.vaisseau = vaisseauGauche;
                 this.vitesseLaterale = Math.Max(this.vitesseLaterale - FacteurAcceleration, -VitesseMaximale);
             }
             else if (facteurInputs > 0.0f)
             {
-                this.vaisseau = vaisseauDroite;
                 this.vitesseLaterale = Math.Min(this.vitesseLaterale + FacteurAcceleration, VitesseMaximale);
             }
             else
@@ -235,14 +233,25 @@ namespace projetJeu
                             ServiceHelper.Get<IInputService>().DeplacementArriere(this.IndexPeripherique);
             if (facteurInputs > 0.0f)
             {
+                if (this.vitesseLaterale >= 0.0f)
+                    this.vaisseau = vaisseauGauche;
+                else
+                    this.vaisseau = vaisseauDroite;
+
                 this.vitesseFrontale = Math.Max(this.vitesseFrontale - FacteurAcceleration, -VitesseMaximale);
             }
             else if (facteurInputs < 0.0f)
             {
+                if (this.vitesseLaterale >= 0.0f)
+                    this.vaisseau = vaisseauDroite;
+                else
+                    this.vaisseau = vaisseauGauche;
+
                 this.vitesseFrontale = Math.Min(this.vitesseFrontale + FacteurAcceleration, VitesseMaximale);
             }
             else
             {
+                this.vaisseau = vaisseauAvant;
                 // Décélération frontale au besoin
                 if (Math.Abs(this.vitesseFrontale) >= FacteurAcceleration)
                 {
