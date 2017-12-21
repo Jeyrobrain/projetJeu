@@ -32,7 +32,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Exercice_5_2
+namespace projetJeu
 {
     using System;
     using System.Collections.Generic;
