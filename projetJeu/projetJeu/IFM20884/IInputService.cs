@@ -72,6 +72,8 @@ namespace IFM20884
         /// <returns>Valeurs entre 0.0 (aucun mouvement) et 1.0 (vitesse maximale).</returns>
         float DeplacementAvant(int device);       // pour avancer
 
+        bool Shoot(int device);
+
         /// <summary>
         /// Retourne un entier entre 0.0 et 1.0 indiquant le facteur de vitesse à appliquer
         /// durant le jeu pour diriger le sprite du joueur vers l'arrière : 0.0 = aucun 

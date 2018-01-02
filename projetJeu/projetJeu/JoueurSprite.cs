@@ -47,6 +47,8 @@ namespace projetJeu
     using Microsoft.Xna.Framework.Graphics;
     using Microsoft.Xna.Framework.Input;
 
+    public delegate void Shoot(Vector2 position, double angle);
+
     /// <summary>
     /// Classe implantant le sprite représentant le vaisseau contrôlé par le joueur. Cette
     /// classe gère trois textures statiques (i.e. partagées par toutes les instances de
@@ -141,6 +143,14 @@ namespace projetJeu
             get { return this.vaisseau; }
         }
 
+        private Shoot shootProjectile;
+
+        public Shoot ShootProjectile
+        {
+            get { return shootProjectile; }
+            set { this.shootProjectile = value; }
+        }
+
         /// <summary>
         /// Propriété contrôlant la vitesse de déplacement latérale du sprite du joueur.
         /// Cette vitesse varie selon le temps afin de simuler l'accélération et la
@@ -201,6 +211,8 @@ namespace projetJeu
             const float FacteurAcceleration = 0.02f;     // facteur d'accélération et de décélération
             const float VitesseMaximale = 0.4f;          // vitesse latérale et frontale maximale
 
+            double angle = 0;
+
             // Changer le vaisseau affiché et ajuster sa position horizontale selon la touche pressée
             // (en tenant compte de l'accélération / décélération)
             float facteurInputs = ServiceHelper.Get<IInputService>().DeplacementDroite(this.IndexPeripherique) -
@@ -234,18 +246,30 @@ namespace projetJeu
             if (facteurInputs > 0.0f)
             {
                 if (this.vitesseLaterale >= 0.0f)
+                {
                     this.vaisseau = vaisseauGauche;
+                    angle = -45;
+                }
                 else
+                {
                     this.vaisseau = vaisseauDroite;
+                    angle = 45;
+                }
 
                 this.vitesseFrontale = Math.Max(this.vitesseFrontale - FacteurAcceleration, -VitesseMaximale);
             }
             else if (facteurInputs < 0.0f)
             {
                 if (this.vitesseLaterale >= 0.0f)
+                {
                     this.vaisseau = vaisseauDroite;
+                    angle = 45;
+                }
                 else
+                {
                     this.vaisseau = vaisseauGauche;
+                    angle = -45;
+                }
 
                 this.vitesseFrontale = Math.Min(this.vitesseFrontale + FacteurAcceleration, VitesseMaximale);
             }
@@ -285,6 +309,12 @@ namespace projetJeu
             if (this.moteursActif.State == SoundState.Playing)
             {
                 this.moteursActif.Volume = Math.Max(Math.Abs(this.vitesseFrontale), Math.Abs(this.vitesseLaterale)) / VitesseMaximale;
+            }
+
+            bool shoot = ServiceHelper.Get<IInputService>().Shoot(this.IndexPeripherique);
+            if (shoot)
+            {
+                this.ShootProjectile(this.Position, angle);
             }
 
             // Déplacer le vaisseau en fonction des vitesses latérales et frontales

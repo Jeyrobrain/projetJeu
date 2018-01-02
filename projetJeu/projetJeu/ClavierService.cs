@@ -139,6 +139,11 @@ namespace projetJeu
             }
         }
 
+        public bool Shoot(int device)
+        {
+            return this.etatClavier.IsKeyDown(Keys.Space);
+        }
+
         /// <summary>
         /// Retourne 1.0f si la flèche en haut du clavier est pressée; 0.0 sinon.
         /// Le paramètre device est ignoré (un seul clavier).

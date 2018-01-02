@@ -131,6 +131,11 @@ namespace projetJeu
             }
         }
 
+        public bool Shoot(int device)
+        {
+            return this.etatManette[device - 1].IsButtonDown(Buttons.A);
+        }
+
         /// <summary>
         /// Retourne 1.0f si le thumbstick droite ou la flèche droite du pad est pressée, 0.0f sinon.
         /// </summary>

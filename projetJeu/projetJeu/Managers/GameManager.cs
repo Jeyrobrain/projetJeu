@@ -21,6 +21,8 @@ namespace projetJeu.Managers
 
         Texture2D mainmenuImage;
 
+        List<Projectile> projectiles = new List<Projectile>();
+
         /// <summary>
         /// Attribut gérant l'affichage en batch à l'écran.
         /// </summary>
@@ -98,10 +100,6 @@ namespace projetJeu.Managers
         private bool fading;
         private bool switchScenes;
 
-
-
-
-
         public GameManager(Game _game)
         {
             this.game = _game;
@@ -158,11 +156,13 @@ namespace projetJeu.Managers
             // Charger les sprites.
             JoueurSprite.LoadContent(this.game.Content, this.graphics);
             ArrierePlanEspace.LoadContent(this.game.Content, this.graphics);
+            Projectile.LoadContent(this.game.Content, this.graphics);
 
             // Créer les sprites du jeu. Premièrement le sprite du joueur centrer au bas de l'écran. On limite ensuite
             // ses déplacements à l'écran.
             this.vaisseauJoueur = new JoueurSprite(this.graphics.GraphicsDevice.Viewport.Width / 8f, this.graphics.GraphicsDevice.Viewport.Height / 2f);
             this.vaisseauJoueur.BoundsRect = new Rectangle(0, 0, this.graphics.GraphicsDevice.Viewport.Width, this.graphics.GraphicsDevice.Viewport.Height);
+            this.vaisseauJoueur.ShootProjectile += Shoot;
 
             // Créer ensuite les sprites représentant les arrière-plans.
             this.arrierePlanEspace = new ArrierePlanEspace(this.graphics);
@@ -177,6 +177,19 @@ namespace projetJeu.Managers
             MediaPlayer.IsRepeating = true;
             MediaPlayer.Play(bruitageFond);
             MediaPlayer.Pause();
+        }
+
+        private void Shoot(Vector2 position, double angle)
+        {
+            Projectile p = new Projectile(position);
+            p.velocity = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * p.speed + new Vector2(5f, 0);
+            p.Position = position + p.velocity * 5f;
+            p.visible = true;
+
+            if (projectiles.Count() < 1000)
+            {
+                projectiles.Add(p);
+            }
         }
 
         public void Update(GameTime gameTime)
@@ -242,6 +255,24 @@ namespace projetJeu.Managers
                     // Mettre à joueur les sprites du jeu
                     this.vaisseauJoueur.Update(gameTime, this.graphics);
                     this.arrierePlanEspace.Update(gameTime, this.graphics);
+
+                    foreach (Projectile p in this.projectiles)
+                    {
+                        p.Update(gameTime, this.graphics);
+                        if (p.Position.X > graphics.GraphicsDevice.Viewport.Width ||
+                            p.Position.X < 0)
+                        {
+                            p.visible = false;
+                        }
+                    }
+                    for (int i = 0; i < projectiles.Count; i++)
+                    {
+                        if (!projectiles[i].visible)
+                        {
+                            projectiles.RemoveAt(i);
+                            i--;
+                        }
+                    }
                 }
             }
         }
@@ -262,9 +293,13 @@ namespace projetJeu.Managers
             {
                 // Afficher l'arrière-plan.
                 this.arrierePlanEspace.Draw(this.camera, this.spriteBatch);
-
                 // Afficher le sprite contrôlé par le joueur.
                 this.vaisseauJoueur.Draw(this.camera, this.spriteBatch);
+
+                foreach (Projectile p in this.projectiles)
+                {
+                    p.Draw(camera, spriteBatch);
+                }
             }
 
             if (fading)
