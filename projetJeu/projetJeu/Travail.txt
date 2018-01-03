@@ -21,7 +21,7 @@ Vitesse et dommage de projectile en relation avec le type
 		✔ Vitesse
 		✖ Dommage
 	Projectile 3
-		✖ Vitesse 
+		✔ Vitesse 
 		✖ Dommage
 
 Trois mode de tirage. Changer par "power-up". Un, deux, ou trois projectiles par tire.
