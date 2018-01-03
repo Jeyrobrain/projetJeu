@@ -22,7 +22,7 @@ namespace projetJeu.Managers
 
         // Police exploitée pour afficher les menus.
         private SpriteFont policeMenuTitre; // titre du menu
-        private SpriteFont policeMenuItem; // items de menu
+        public SpriteFont policeMenuItem; // items de menu
 
         // Couleur de la police exploitée pour afficher les menus.
         private Color couleurMenuTitre = Color.White; // titre du menu
@@ -38,7 +38,7 @@ namespace projetJeu.Managers
             {
                 this.menuCourant = value;
                 // Mettre le jeu en pause si un menu est affiché.
-                if (this.gameManager.EtatJeu != GameManager.Etats.Demarrer)
+                if (this.gameManager.EtatJeu == GameManager.Etats.Jouer)
                     this.gameManager.Pause = this.menuCourant != null;
             }
         }
@@ -53,8 +53,8 @@ namespace projetJeu.Managers
             Menu.LoadContent(this.gameManager.GetContent());
 
             // Charger les polices.
-            this.policeMenuTitre = this.gameManager.GetContent().Load<SpriteFont>(@"Pipeline\Polices\MainMenuPolice");
-            this.policeMenuItem = this.gameManager.GetContent().Load<SpriteFont>(@"Pipeline\Polices\MainMenuPolice");
+            this.policeMenuTitre = this.gameManager.GetContent().Load<SpriteFont>(@"Pipeline\Polices\PoliceTitre");
+            this.policeMenuItem = this.gameManager.GetContent().Load<SpriteFont>(@"Pipeline\Polices\PoliceItem");
 
             // Charger tous les menus disponibles et les stocker dans la liste des menus.
             // Obtenir d’abord une liste des fichiers XML de définition de menu.
@@ -74,17 +74,27 @@ namespace projetJeu.Managers
         // Fonction déléguée fournie à tous les menus du jeu pour traiter les sélections de l'usager.
         protected void SelectionItemMenu(string nomMenu, ItemDeMenu item)
         {
-            // Est-ce le menu pour quitter le jeu?
             if (nomMenu == "MainMenu")
-                // Deux sélections possibles : Oui ou Non
                 switch (item.Nom)
                 {
                     case "Commencer": // l'usager veut commencer le jeu
-                        gameManager.FadeOut();
+                        gameManager.FadeOut(GameManager.Etats.Jouer);
+                        break;
+                    case "Information":
+                        gameManager.FadeOut(GameManager.Etats.Info);
                         break;
                     case "Quitter": // l'usager veut quitter le jeu
                         gameManager.Exit();
                         Environment.Exit(0);
+                        break;
+                    default:
+                        break;
+                }
+            else if (nomMenu == "Information")
+                switch (item.Nom)
+                {
+                    case "Retour": // l'usager veut commencer le jeu
+                        gameManager.FadeOut(GameManager.Etats.Demarrer);
                         break;
                     default:
                         break;

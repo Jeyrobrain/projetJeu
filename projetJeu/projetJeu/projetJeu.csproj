@@ -78,7 +78,10 @@
     <Content Include="Content\ArrieresPlans\seamless-space-purple.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Projectiles\blue-orb.png">
+    <Content Include="Content\Projectiles\blue-energy-ball.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Projectiles\small-fire-shot.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Vaisseau\shipLeft.png">

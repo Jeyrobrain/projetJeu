@@ -43,6 +43,8 @@ namespace projetJeu.Managers
             /// </summary>
             Demarrer,
 
+            Info,
+
             /// <summary>
             /// En cours de jeu.
             /// </summary>
@@ -68,6 +70,8 @@ namespace projetJeu.Managers
         /// Etat dans lequel état le jeu avant que la dernière pause ne soit activée.
         /// </summary>
         private Etats prevEtatJeu;
+
+        private Etats nextEtatJeu;
 
         /// <summary>
         /// Propriété (accesseur pour etatJeu) retournant ou changeant l'état du jeu.
@@ -179,16 +183,17 @@ namespace projetJeu.Managers
             MediaPlayer.Pause();
         }
 
-        private void Shoot(Vector2 position, double angle)
+        private void Shoot(Vector2[] positions, double angle, ProjectileType projectileType)
         {
-            Projectile p = new Projectile(position);
-            p.velocity = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * p.speed + new Vector2(5f, 0);
-            p.Position = position + p.velocity * 5f;
-            p.visible = true;
-
-            if (projectiles.Count() < 1000)
+            for (int i = 0; i < MathHelper.Clamp(positions.Length, 1, 5); i++)
             {
-                projectiles.Add(p);
+                Projectile p = new Projectile(positions[i], projectileType);
+                p.velocity = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * p.speed;
+                p.Position += p.velocity * 5f;
+                if (projectiles.Count() < 1000)
+                {
+                    projectiles.Add(p);
+                }
             }
         }
 
@@ -220,7 +225,31 @@ namespace projetJeu.Managers
                 {
                     if (switchScenes)
                     {
-                        this.EtatJeu = Etats.Jouer;
+                        this.EtatJeu = nextEtatJeu;
+                        if (EtatJeu == Etats.Info)
+                        {
+                            menuManager.MenuCourant = menuManager.TrouverMenu("Information");
+                        }
+                    }
+                }
+            }
+            else if (this.EtatJeu == Etats.Info)
+            {
+                if (!fading)
+                {
+                    if (switchScenes)
+                    {
+                        switchScenes = false;
+                    }
+                    this.menuManager.MenuCourant.GetInput(gameTime);
+                }
+                else
+                {
+                    if (switchScenes &&  this.nextEtatJeu == Etats.Demarrer)
+                    {
+                        switchScenes = false;
+                        this.EtatJeu = nextEtatJeu;
+                        menuManager.MenuCourant = menuManager.TrouverMenu("MainMenu");
                     }
                 }
             }
@@ -231,6 +260,7 @@ namespace projetJeu.Managers
                     if (switchScenes)
                     {
                         switchScenes = false;
+                        menuManager.MenuCourant = null;
                         SuspendreEffetsSonores(false);
                     }
                     // Permettre de quitter le jeu via le service d'input.
@@ -256,18 +286,12 @@ namespace projetJeu.Managers
                     this.vaisseauJoueur.Update(gameTime, this.graphics);
                     this.arrierePlanEspace.Update(gameTime, this.graphics);
 
-                    foreach (Projectile p in this.projectiles)
-                    {
-                        p.Update(gameTime, this.graphics);
-                        if (p.Position.X > graphics.GraphicsDevice.Viewport.Width ||
-                            p.Position.X < 0)
-                        {
-                            p.visible = false;
-                        }
-                    }
                     for (int i = 0; i < projectiles.Count; i++)
                     {
-                        if (!projectiles[i].visible)
+                        Projectile p = projectiles[i];
+                        p.Update(gameTime, this.graphics);
+                        if (p.Position.X > this.graphics.GraphicsDevice.Viewport.Width ||
+                            p.Position.X < 0f)
                         {
                             projectiles.RemoveAt(i);
                             i--;
@@ -284,11 +308,20 @@ namespace projetJeu.Managers
             // À FAIRE: Ajoutez votre code d'affichage ici.
             this.spriteBatch.Begin();
 
-            if (EtatJeu == Etats.Demarrer)
+            if (EtatJeu == Etats.Demarrer || EtatJeu == Etats.Info)
             {
                 this.spriteBatch.Draw(mainmenuImage, graphics.GraphicsDevice.Viewport.Bounds, Color.White);
+                if (EtatJeu == Etats.Info)
+                {
+                    spriteBatch.DrawString(menuManager.policeMenuItem, 
+                                           "Numpad pour changer # de projectiles\n  + pour changer le type de projectile", 
+                                           new Vector2(graphics.GraphicsDevice.Viewport.Width / 2 - 173f, 
+                                                       graphics.GraphicsDevice.Viewport.Height / 2 - 50f), 
+                                           Color.White);
+                }
                 this.menuManager.Draw(spriteBatch);
             }
+
             else if (EtatJeu == Etats.Jouer || this.EtatJeu == Etats.Pause)
             {
                 // Afficher l'arrière-plan.
@@ -369,8 +402,11 @@ namespace projetJeu.Managers
             }
         }
 
-        public void FadeOut()
+        public void FadeOut(Etats etat)
         {
+            nextEtatJeu = etat;
+            _faderAlpha = 0f;
+            _faderAlphaIncrement = 10;
             fading = true;
         }
     }

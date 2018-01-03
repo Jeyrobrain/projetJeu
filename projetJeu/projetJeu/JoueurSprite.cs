@@ -47,7 +47,7 @@ namespace projetJeu
     using Microsoft.Xna.Framework.Graphics;
     using Microsoft.Xna.Framework.Input;
 
-    public delegate void Shoot(Vector2 position, double angle);
+    public delegate void Shoot(Vector2[] positions, double angle, ProjectileType projectileType);
 
     /// <summary>
     /// Classe implantant le sprite représentant le vaisseau contrôlé par le joueur. Cette
@@ -57,6 +57,9 @@ namespace projetJeu
     /// </summary>
     public class JoueurSprite : Sprite
     {
+        private ProjectileType projectileType = ProjectileType.smallFireShot;
+        private int projectileCount = 1;
+
         /// <summary>
         /// Effet sonore contenant le bruitage des moteurs.
         /// </summary>
@@ -248,12 +251,12 @@ namespace projetJeu
                 if (this.vitesseLaterale >= 0.0f)
                 {
                     this.vaisseau = vaisseauGauche;
-                    angle = -45;
+                    angle = 100;
                 }
                 else
                 {
                     this.vaisseau = vaisseauDroite;
-                    angle = 45;
+                    angle = -100;
                 }
 
                 this.vitesseFrontale = Math.Max(this.vitesseFrontale - FacteurAcceleration, -VitesseMaximale);
@@ -263,12 +266,12 @@ namespace projetJeu
                 if (this.vitesseLaterale >= 0.0f)
                 {
                     this.vaisseau = vaisseauDroite;
-                    angle = 45;
+                    angle = -100;
                 }
                 else
                 {
                     this.vaisseau = vaisseauGauche;
-                    angle = -45;
+                    angle = 100;
                 }
 
                 this.vitesseFrontale = Math.Min(this.vitesseFrontale + FacteurAcceleration, VitesseMaximale);
@@ -311,16 +314,50 @@ namespace projetJeu
                 this.moteursActif.Volume = Math.Max(Math.Abs(this.vitesseFrontale), Math.Abs(this.vitesseLaterale)) / VitesseMaximale;
             }
 
-            bool shoot = ServiceHelper.Get<IInputService>().Shoot(this.IndexPeripherique);
+            int changeProjectileCount = ServiceHelper.Get<IInputService>().SetProjectileCount(this.IndexPeripherique);
+            if (changeProjectileCount != 0)
+            {
+                this.projectileCount = changeProjectileCount;
+            }
+
+            bool changeProjectile = ServiceHelper.Get<IInputService>().SetProjectile(this.IndexPeripherique);
+            if (changeProjectile)
+            {
+                this.projectileType = (ProjectileType)(((int)this.projectileType + 1) % ((int)ProjectileType.smallFireShot + 1));
+            }
+
+            bool shoot = ServiceHelper.Get<IInputService>().Shoot(this.IndexPeripherique, this.projectileType);
             if (shoot)
             {
-                this.ShootProjectile(this.Position, angle);
+                this.ShootProjectile(GetProjectilePositions(), angle, this.projectileType);
             }
 
             // Déplacer le vaisseau en fonction des vitesses latérales et frontales
             this.Position = new Vector2(
                 this.Position.X + (gameTime.ElapsedGameTime.Milliseconds * this.vitesseLaterale),
                 this.Position.Y + (gameTime.ElapsedGameTime.Milliseconds * this.vitesseFrontale));
+        }
+
+        private Vector2[] GetProjectilePositions()
+        {
+            switch (projectileCount)
+            {
+                case 1:
+                    return new Vector2[] { this.Position };
+                case 2:
+                    return new Vector2[] { 
+                        new Vector2(this.Position.X, this.Position.Y - this.Texture.Height / 2), 
+                        new Vector2(this.Position.X, this.Position.Y + this.Texture.Height / 2) 
+                    };
+                case 3:
+                    return new Vector2[] { 
+                        this.Position,
+                        new Vector2(this.Position.X - this.Texture.Width / 2, this.Position.Y - this.Texture.Height / 2), 
+                        new Vector2(this.Position.X - this.Texture.Width / 2, this.Position.Y + this.Texture.Height / 2) 
+                    };
+                default:
+                    return new Vector2[] { this.Position };
+            }
         }
 
         /// <summary>

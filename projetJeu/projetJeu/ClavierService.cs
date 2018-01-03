@@ -139,11 +139,6 @@ namespace projetJeu
             }
         }
 
-        public bool Shoot(int device)
-        {
-            return this.etatClavier.IsKeyDown(Keys.Space);
-        }
-
         /// <summary>
         /// Retourne 1.0f si la flèche en haut du clavier est pressée; 0.0 sinon.
         /// Le paramètre device est ignoré (un seul clavier).
@@ -294,6 +289,52 @@ namespace projetJeu
         public bool MenuItemSelection(int device)
         {
             return this.etatClavier.IsKeyDown(Keys.Enter);
+        }
+
+
+
+
+
+        public bool Shoot(int device, ProjectileType projectileType)
+        {
+            int delay = 200;
+            switch (projectileType)
+            {
+                case ProjectileType.blueEnergyBall:
+                    delay = 350;
+                    break;
+                case ProjectileType.smallFireShot:
+                    delay = 75;
+                    break;
+                default:
+                    break;
+            }
+            return this.DelaiDuplicationExpire(Keys.Space, delay);
+        }
+
+        public bool SetProjectile(int device)
+        {
+            return DelaiDuplicationExpire(Keys.Add, 1000);
+        }
+
+        public int SetProjectileCount(int device)
+        {
+            if (DelaiDuplicationExpire(Keys.NumPad1, 1000))
+            {
+                return 1;
+            }
+            else if (DelaiDuplicationExpire(Keys.NumPad2, 1000))
+            {
+                return 2;
+            }
+            else if (DelaiDuplicationExpire(Keys.NumPad3, 1000))
+            {
+                return 3;
+            }
+            else
+            {
+                return 0;
+            }
         }
     }
 }

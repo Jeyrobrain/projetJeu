@@ -34,9 +34,18 @@
 /processorParam:Quality=Best
 /build:Pipeline/SoundFX/menuitem_change.wav
 
-#begin Pipeline/Polices/MainMenuPolice.spritefont
+#begin Pipeline\Polices\PoliceTitre.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:TextureFormat=Compressed
-/build:Pipeline/Polices/MainMenuPolice.spritefont
+/build:Pipeline\Polices\PoliceTitre.spritefont
+
+#begin Pipeline/Polices/PoliceItem.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Pipeline/Polices/PoliceItem.spritefont
+
+#begin Pipeline/Menus/Information.xml
+/copy:Pipeline/Menus/Information.xml
 

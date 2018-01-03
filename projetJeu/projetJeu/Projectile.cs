@@ -13,19 +13,36 @@ namespace projetJeu
     class Projectile : SpriteAnimation
     {
         public Vector2 velocity;
+        public Vector2 speed;
+        private ProjectileType projectileType;
+        public Vector2 startPos;
 
-        public Vector2 speed = new Vector2(5f, 5f);
-
-        public bool visible;
-
-        public Projectile(float x, float y) : base(x, y)
+        public Projectile(float x, float y, ProjectileType type) : base(x, y)
         {
-
+            switch (projectileType)
+            {
+                case ProjectileType.blueEnergyBall:
+                    speed = new Vector2(8f, 8f);
+                    break;
+                default:
+                    break;
+            }
+            this.startPos = base.Position;
+            this.projectileType = type;
         }
 
-        public Projectile(Vector2 position) : base(position)
+        public Projectile(Vector2 position, ProjectileType type) : base(position)
         {
-
+            switch (projectileType)
+            {
+                case ProjectileType.blueEnergyBall:
+                    speed = new Vector2(8f, 8f);
+                    break;
+                default:
+                    break;
+            }
+            this.startPos = base.Position;
+            this.projectileType = type;
         }
 
         /// <summary>
@@ -38,7 +55,7 @@ namespace projetJeu
         /// Surchargé afin de retourner la palette correspondante au projectile
         /// </summary>
         protected override Palette PaletteAnimation {
-            get { return palettes[0]; }
+            get { return palettes[(int)projectileType]; }
         }
 
         /// <summary>
@@ -49,7 +66,8 @@ namespace projetJeu
         /// les caractéristiques de celui-ci (p.ex. l'écran).</param>
         public static void LoadContent(ContentManager content, GraphicsDeviceManager graphics)
         {
-            palettes.Add(new Palette(content.Load<Texture2D>(@"Projectiles\blue-orb"), 100, 100));
+            palettes.Add(new Palette(content.Load<Texture2D>(@"Projectiles\blue-energy-ball"), 100, 100));
+            palettes.Add(new Palette(content.Load<Texture2D>(@"Projectiles\small-fire-shot"), 17, 17));
         }
 
         /// <summary>

@@ -5,14 +5,19 @@
   <MenuItem>
     <MenuItemNom>Commencer</MenuItemNom>
     <MenuItemTitre>Commencer</MenuItemTitre>
-    <MenuItemIndent>95</MenuItemIndent>
+    <MenuItemIndent>115</MenuItemIndent>
+  </MenuItem>
+  <MenuItem>
+    <MenuItemNom>Information</MenuItemNom>
+    <MenuItemTitre>Information</MenuItemTitre>
+    <MenuItemIndent>118</MenuItemIndent>
   </MenuItem>
   <MenuItem>
     <MenuItemNom>Quitter</MenuItemNom>
     <MenuItemTitre>Quitter</MenuItemTitre>
-    <MenuItemIndent>115</MenuItemIndent>
+    <MenuItemIndent>135</MenuItemIndent>
   </MenuItem>
   <PositionX>225</PositionX>
   <PositionY>175</PositionY>
-  <IndexSelectionItem>1</IndexSelectionItem>
+  <IndexSelectionItem>0</IndexSelectionItem>
 </Menu>
