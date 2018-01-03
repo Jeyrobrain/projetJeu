@@ -12,36 +12,70 @@ namespace projetJeu
 {
     class Projectile : SpriteAnimation
     {
-        public Vector2 velocity;
-        public Vector2 speed;
+        private Vector2 velocity;
+        private Vector2 speed;
         private ProjectileType projectileType;
-        public Vector2 startPos;
+        private Vector2 startPos;
 
-        public Projectile(float x, float y, ProjectileType type) : base(x, y)
+        public Vector2 Velocity
         {
-            switch (projectileType)
+            get { return velocity; }
+            set { velocity = value; }
+        }
+
+        public Vector2 Speed
+        {
+            get { return speed; }
+            set { speed = value; }
+        }
+
+        public Vector2 StartPos
+        {
+            get { return startPos; }
+            set { startPos = value; }
+        }
+
+        public float angle = 0f;
+
+        public Projectile(float x, float y, ProjectileType type)
+            : base(x, y)
+        {
+            switch (type)
             {
                 case ProjectileType.blueEnergyBall:
-                    speed = new Vector2(8f, 8f);
+                    Speed = new Vector2(8f, 8);
+                    break;
+                case ProjectileType.smallFireShot:
+                    Speed = new Vector2(10f, 10f);
+                    break;
+                case ProjectileType.disque:
+                    Speed = new Vector2(4f, 4f);
                     break;
                 default:
                     break;
             }
-            this.startPos = base.Position;
+            this.StartPos = base.Position;
             this.projectileType = type;
         }
 
-        public Projectile(Vector2 position, ProjectileType type) : base(position)
+        public Projectile(Vector2 position, ProjectileType type)
+            : base(position)
         {
-            switch (projectileType)
+            switch (type)
             {
                 case ProjectileType.blueEnergyBall:
-                    speed = new Vector2(8f, 8f);
+                    Speed = new Vector2(8f, 8f);
+                    break;
+                case ProjectileType.smallFireShot:
+                    Speed = new Vector2(10f, 10f);
+                    break;
+                case ProjectileType.disque:
+                    Speed = new Vector2(4f, 4f);
                     break;
                 default:
                     break;
             }
-            this.startPos = base.Position;
+            this.StartPos = base.Position;
             this.projectileType = type;
         }
 
@@ -54,7 +88,8 @@ namespace projetJeu
         /// <summary>
         /// Surchargé afin de retourner la palette correspondante au projectile
         /// </summary>
-        protected override Palette PaletteAnimation {
+        protected override Palette PaletteAnimation
+        {
             get { return palettes[(int)projectileType]; }
         }
 
@@ -66,8 +101,9 @@ namespace projetJeu
         /// les caractéristiques de celui-ci (p.ex. l'écran).</param>
         public static void LoadContent(ContentManager content, GraphicsDeviceManager graphics)
         {
-            palettes.Add(new Palette(content.Load<Texture2D>(@"Projectiles\blue-energy-ball"), 100, 100));
+            palettes.Add(new Palette(content.Load<Texture2D>(@"Projectiles\disque"), 25, 25));
             palettes.Add(new Palette(content.Load<Texture2D>(@"Projectiles\small-fire-shot"), 17, 17));
+            palettes.Add(new Palette(content.Load<Texture2D>(@"Projectiles\blue-energy-ball"), 100, 100));
         }
 
         /// <summary>
@@ -77,7 +113,19 @@ namespace projetJeu
         /// <param name="graphics">Gestionnaire de périphérique d'affichage.</param>
         public override void Update(GameTime gameTime, GraphicsDeviceManager graphics)
         {
-            this.Position += this.velocity;
+            switch (projectileType)
+            {
+                case ProjectileType.disque:
+                    angle += 0.1f;
+                    break;
+                case ProjectileType.smallFireShot:
+                case ProjectileType.blueEnergyBall:
+                    angle = Velocity.X != Speed.X ? angle = Velocity.Y < 0 ? 100 : -100 : 0f;
+                    break;
+                default:
+                    break;
+            }
+            this.Position += this.Velocity;
             base.Update(gameTime, graphics);
         }
     }

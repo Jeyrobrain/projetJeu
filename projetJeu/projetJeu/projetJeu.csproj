@@ -40,6 +40,7 @@
   <ItemGroup>
     <Compile Include="ArrierePlanEspace.cs" />
     <Compile Include="ClavierService.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Managers\GameManager.cs" />
     <Compile Include="JoueurSprite.cs" />
@@ -79,6 +80,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Projectiles\blue-energy-ball.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Projectiles\disque.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Projectiles\small-fire-shot.png">

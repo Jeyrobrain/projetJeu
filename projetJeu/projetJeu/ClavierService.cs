@@ -306,6 +306,9 @@ namespace projetJeu
                 case ProjectileType.smallFireShot:
                     delay = 75;
                     break;
+                case ProjectileType.disque:
+                    delay = 1000;
+                    break;
                 default:
                     break;
             }

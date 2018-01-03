@@ -1,9 +1,45 @@
-5 ennemi
-1joueur
-1boss
+﻿✔ Un jeu de style vaisseau à l'horizontale
 
-enemmi echape des powerups
-	augment la vitesse de tir
-		3 type de powerup 
+Un menu principale
+	✔ Menu démarage (Commencer, Info, Quitter)
+	✔ Menu Information
 
-systeme de points (avec temps, ennemie echape des points)
+Un joueur principale (un vaisseau)
+	✔ Sprite et déplacement
+	✔ Tirage avec espace
+
+Trois types de projectiles
+	✔ Projectile 1 (Vite et petit)
+	✔ Projectile 2 (Moyen et lent)
+	✔ Projectile 3 (Disque qui bouge)
+
+Vitesse et dommage de projectile en relation avec le type
+	Projectile 1
+		✔ Vitesse
+		✖ Dommage
+	Projectile 2
+		✔ Vitesse
+		✖ Dommage
+	Projectile 3
+		✖ Vitesse 
+		✖ Dommage
+
+Trois mode de tirage. Changer par "power-up". Un, deux, ou trois projectiles par tire.
+	✔ Mode 1
+	✔ Mode 2
+	✔ Mode 3
+	✖ Power-up
+
+Ennemi venant de la gauche de l'écran. Peut échapper un "power-up".
+	3 type d'ennemi
+		✖ Ennemi 1
+		✖ Ennemi 2
+		✖ Ennemi 3
+	Comment ennemi va bouger? (Random pour simplifier?)
+
+Système de points très simple.
+	✖ Affichage de points
+		✖ Points par seconde
+		✖ Points par ennemi mort
+
+✖ Un boss finale.

@@ -175,9 +175,9 @@ namespace IFM20884
         /// <param name="tuileIdx">Index de la tuile à afficher.</param>
         /// <param name="destRect">Position où afficher la tuile à l'écran.</param>
         /// <param name="spriteBatch">Gestionnaire d'affichage en batch aux périphériques.</param>
-        public void Draw(int tuileIdx, Rectangle destRect, SpriteBatch spriteBatch)
+        public void Draw(float angle, int tuileIdx, Rectangle destRect, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(this.tuiles, destinationRectangle: destRect, sourceRectangle: this.SourceRect(tuileIdx));   // afficher la tuile
+            spriteBatch.Draw(this.tuiles, destinationRectangle: destRect, sourceRectangle: this.SourceRect(tuileIdx), rotation: angle);   // afficher la tuile
         }
     }
 }

@@ -207,7 +207,7 @@ namespace IFM20884
         /// </summary>
         /// <param name="camera">Caméra à exploiter pour l'affichage.</param>
         /// <param name="spriteBatch">Gestionnaire d'affichage en batch aux périphériques.</param>
-        public override void Draw(Camera camera, SpriteBatch spriteBatch)
+        public override void Draw(float angle, Camera camera, SpriteBatch spriteBatch)
         {
             // Calculer les coordonnées du sprite dans le monde.
             Rectangle destRect = new Rectangle(0, 0, this.Width, this.Height);
@@ -222,7 +222,7 @@ namespace IFM20884
                 camera.Monde2Camera(ref destRect);
 
                 // Afficher la tuile courante
-                this.PaletteAnimation.Draw(this.IndexTuile, destRect, spriteBatch);
+                this.PaletteAnimation.Draw(angle, this.IndexTuile, destRect, spriteBatch);
             }
         }
     }

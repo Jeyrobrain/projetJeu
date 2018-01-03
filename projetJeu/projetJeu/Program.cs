@@ -32,20 +32,6 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-public enum ProjectileType {
-    blueEnergyBall,
-    smallFireShot
-}
-
-
-
-
-
-
-
-
-
-
 namespace projetJeu
 {
     using System;

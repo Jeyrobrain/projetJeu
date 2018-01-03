@@ -47,7 +47,7 @@ namespace projetJeu
     using Microsoft.Xna.Framework.Graphics;
     using Microsoft.Xna.Framework.Input;
 
-    public delegate void Shoot(Vector2[] positions, double angle, ProjectileType projectileType);
+    public delegate void Shoot(Vector2[] positions, double[] angle, ProjectileType projectileType);
 
     /// <summary>
     /// Classe implantant le sprite représentant le vaisseau contrôlé par le joueur. Cette
@@ -323,19 +323,43 @@ namespace projetJeu
             bool changeProjectile = ServiceHelper.Get<IInputService>().SetProjectile(this.IndexPeripherique);
             if (changeProjectile)
             {
-                this.projectileType = (ProjectileType)(((int)this.projectileType + 1) % ((int)ProjectileType.smallFireShot + 1));
+                this.projectileType = (ProjectileType)(((int)this.projectileType + 1) % ((int)ProjectileType.blueEnergyBall + 1));
             }
 
             bool shoot = ServiceHelper.Get<IInputService>().Shoot(this.IndexPeripherique, this.projectileType);
             if (shoot)
             {
-                this.ShootProjectile(GetProjectilePositions(), angle, this.projectileType);
+                this.ShootProjectile(GetProjectilePositions(), GetProjectileAngle(), this.projectileType);
             }
 
             // Déplacer le vaisseau en fonction des vitesses latérales et frontales
             this.Position = new Vector2(
                 this.Position.X + (gameTime.ElapsedGameTime.Milliseconds * this.vitesseLaterale),
                 this.Position.Y + (gameTime.ElapsedGameTime.Milliseconds * this.vitesseFrontale));
+        }
+
+        private double[] GetProjectileAngle()
+        {
+            switch (projectileCount)
+            {
+                case 1:
+                    return new double[] { 0f };
+                case 2:
+                    return new double[] { 
+                        0f,
+                        0f
+                    };
+                case 3:
+                    return new double[] { 
+                        0f,
+                        100f,
+                        -100f
+                    };
+                default:
+                    return new double[] {
+                        0f
+                    };
+            }
         }
 
         private Vector2[] GetProjectilePositions()

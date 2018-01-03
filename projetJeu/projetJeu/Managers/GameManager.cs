@@ -19,9 +19,9 @@ namespace projetJeu.Managers
 
         private GraphicsDeviceManager graphics;
 
-        Texture2D mainmenuImage;
+        private Texture2D mainmenuImage;
 
-        List<Projectile> projectiles = new List<Projectile>();
+        private List<Projectile> projectiles = new List<Projectile>();
 
         /// <summary>
         /// Attribut gérant l'affichage en batch à l'écran.
@@ -183,13 +183,13 @@ namespace projetJeu.Managers
             MediaPlayer.Pause();
         }
 
-        private void Shoot(Vector2[] positions, double angle, ProjectileType projectileType)
+        private void Shoot(Vector2[] positions, double[] angle, ProjectileType projectileType)
         {
-            for (int i = 0; i < MathHelper.Clamp(positions.Length, 1, 5); i++)
+            for (int i = 0; i < MathHelper.Clamp(positions.Length, 1, 3); i++)
             {
                 Projectile p = new Projectile(positions[i], projectileType);
-                p.velocity = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * p.speed;
-                p.Position += p.velocity * 5f;
+                p.Velocity = new Vector2((float)Math.Cos(angle[i]), (float)Math.Sin(angle[i])) * p.Speed;
+                p.Position += p.Velocity * 5f;
                 if (projectiles.Count() < 1000)
                 {
                     projectiles.Add(p);
@@ -325,13 +325,13 @@ namespace projetJeu.Managers
             else if (EtatJeu == Etats.Jouer || this.EtatJeu == Etats.Pause)
             {
                 // Afficher l'arrière-plan.
-                this.arrierePlanEspace.Draw(this.camera, this.spriteBatch);
+                this.arrierePlanEspace.Draw(0f, this.camera, this.spriteBatch);
                 // Afficher le sprite contrôlé par le joueur.
-                this.vaisseauJoueur.Draw(this.camera, this.spriteBatch);
+                this.vaisseauJoueur.Draw(0f, this.camera, this.spriteBatch);
 
                 foreach (Projectile p in this.projectiles)
                 {
-                    p.Draw(camera, spriteBatch);
+                    p.Draw(p.angle, camera, spriteBatch);
                 }
             }
 
