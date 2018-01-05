@@ -79,6 +79,11 @@
     <Content Include="Content\ArrieresPlans\seamless-space-purple.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Pipeline\Menus\Information.xml" />
+    <Content Include="Content\Pipeline\Menus\MainMenu.xml" />
+    <Content Include="Content\Pipeline\Songs\scifi072.wav" />
+    <Content Include="Content\Pipeline\SoundFX\menuitem_change.wav" />
+    <Content Include="Content\Pipeline\SoundFX\misc291.wav" />
     <Content Include="Content\Projectiles\blue-energy-ball.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -104,6 +109,10 @@
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Content\Pipeline\Polices\PoliceItem.spritefont" />
+    <None Include="Content\Pipeline\Polices\PoliceTitre.spritefont" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />

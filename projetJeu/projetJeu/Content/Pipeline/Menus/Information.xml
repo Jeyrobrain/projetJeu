@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Menu>
+  <MenuNom>Information</MenuNom>
+  <MenuTitre></MenuTitre>
+  <MenuItem>
+    <MenuItemNom>Retour</MenuItemNom>
+    <MenuItemTitre>Retour</MenuItemTitre>
+    <MenuItemIndent>135</MenuItemIndent>
+  </MenuItem>
+  <PositionX>225</PositionX>
+  <PositionY>265</PositionY>
+  <IndexSelectionItem>0</IndexSelectionItem>
+</Menu>
