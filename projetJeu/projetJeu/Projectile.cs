@@ -120,12 +120,12 @@ namespace projetJeu
                     break;
                 case ProjectileType.smallFireShot:
                 case ProjectileType.blueEnergyBall:
-                    angle = Velocity.X != Speed.X ? angle = Velocity.Y < 0f ? -(MathHelper.Pi / 4f) : (MathHelper.Pi / 4f) : 0f;
+                    angle = Velocity.X != Speed.X ? angle = Velocity.Y < 0f ? -(MathHelper.Pi / 5.142859f) : (MathHelper.Pi / 5.142859f) : 0f; // 35 rad
                     break;
                 default:
                     break;
             }
-            this.Position += this.Velocity;
+            this.Position += gameTime.ElapsedGameTime.Milliseconds * (this.Velocity * 0.06f);
             base.Update(gameTime, graphics);
         }
     }

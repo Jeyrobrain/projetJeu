@@ -251,12 +251,12 @@ namespace projetJeu
                 if (this.vitesseLaterale >= 0.0f)
                 {
                     this.vaisseau = vaisseauGauche;
-                    angle = -(MathHelper.Pi / 4f);
+                    angle = -(MathHelper.Pi / 5.142859f); // 35 rad
                 }
                 else
                 {
                     this.vaisseau = vaisseauDroite;
-                    angle = (MathHelper.Pi / 4f);
+                    angle = (MathHelper.Pi / 5.142859f); // 35 rad
                 }
 
                 this.vitesseFrontale = Math.Max(this.vitesseFrontale - FacteurAcceleration, -VitesseMaximale);
@@ -266,12 +266,12 @@ namespace projetJeu
                 if (this.vitesseLaterale >= 0.0f)
                 {
                     this.vaisseau = vaisseauDroite;
-                    angle = (MathHelper.Pi / 4f);
+                    angle = (MathHelper.Pi / 5.142859f); // 35 rad;
                 }
                 else
                 {
                     this.vaisseau = vaisseauGauche;
-                    angle = -(MathHelper.Pi / 4f);
+                    angle = -(MathHelper.Pi / 5.142859f); // 35 rad;
                 }
 
                 this.vitesseFrontale = Math.Min(this.vitesseFrontale + FacteurAcceleration, VitesseMaximale);
@@ -347,17 +347,17 @@ namespace projetJeu
                 case 2:
                     return new double[] { 
                         0f + angleBase,
-                        0f + angleBase
+                        0f + angleBase 
                     };
                 case 3:
                     return new double[] { 
-                        0f + angleBase,
-                        -(MathHelper.Pi / 4f) + angleBase,
-                        (MathHelper.Pi / 4f) + angleBase
+                        0f + angleBase ,
+                        -(MathHelper.Pi / 5.142859f)  + angleBase, // 35 rad
+                        (MathHelper.Pi / 5.142859f) + angleBase   // 35 rad
                     };
                 default:
                     return new double[] {
-                        0f + angleBase
+                        0f + angleBase 
                     };
             }
         }
@@ -370,15 +370,15 @@ namespace projetJeu
                     return new Vector2[] { this.Position };
                 case 2:
                     return new Vector2[] { 
-                        new Vector2(this.Position.X, this.Position.Y - this.Texture.Height / 2), 
-                        new Vector2(this.Position.X, this.Position.Y + this.Texture.Height / 2) 
+                        new Vector2(this.Position.X, this.Position.Y - this.Texture.Height / 2f), 
+                        new Vector2(this.Position.X, this.Position.Y + this.Texture.Height / 2f) 
                     };
                 case 3:
                     return new Vector2[] { 
                         this.Position,
                         new Vector2(this.Position.X - this.Texture.Width / 2, this.Position.Y - this.Texture.Height / 2), 
                         new Vector2(this.Position.X - this.Texture.Width / 2, this.Position.Y + this.Texture.Height / 2) 
-                    };
+                     };
                 default:
                     return new Vector2[] { this.Position };
             }
