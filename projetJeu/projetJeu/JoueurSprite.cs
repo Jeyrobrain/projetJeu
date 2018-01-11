@@ -214,7 +214,7 @@ namespace projetJeu
             const float FacteurAcceleration = 0.02f;     // facteur d'accélération et de décélération
             const float VitesseMaximale = 0.4f;          // vitesse latérale et frontale maximale
 
-            double angle = 0;
+            double angle = 0f;
 
             // Changer le vaisseau affiché et ajuster sa position horizontale selon la touche pressée
             // (en tenant compte de l'accélération / décélération)
@@ -251,12 +251,12 @@ namespace projetJeu
                 if (this.vitesseLaterale >= 0.0f)
                 {
                     this.vaisseau = vaisseauGauche;
-                    angle = 100;
+                    angle = -(MathHelper.Pi / 4f);
                 }
                 else
                 {
                     this.vaisseau = vaisseauDroite;
-                    angle = -100;
+                    angle = (MathHelper.Pi / 4f);
                 }
 
                 this.vitesseFrontale = Math.Max(this.vitesseFrontale - FacteurAcceleration, -VitesseMaximale);
@@ -266,12 +266,12 @@ namespace projetJeu
                 if (this.vitesseLaterale >= 0.0f)
                 {
                     this.vaisseau = vaisseauDroite;
-                    angle = -100;
+                    angle = (MathHelper.Pi / 4f);
                 }
                 else
                 {
                     this.vaisseau = vaisseauGauche;
-                    angle = 100;
+                    angle = -(MathHelper.Pi / 4f);
                 }
 
                 this.vitesseFrontale = Math.Min(this.vitesseFrontale + FacteurAcceleration, VitesseMaximale);
@@ -329,7 +329,7 @@ namespace projetJeu
             bool shoot = ServiceHelper.Get<IInputService>().Shoot(this.IndexPeripherique, this.projectileType);
             if (shoot)
             {
-                this.ShootProjectile(GetProjectilePositions(), GetProjectileAngle(), this.projectileType);
+                this.ShootProjectile(GetProjectilePositions(), GetProjectileAngle(angle), this.projectileType);
             }
 
             // Déplacer le vaisseau en fonction des vitesses latérales et frontales
@@ -338,26 +338,26 @@ namespace projetJeu
                 this.Position.Y + (gameTime.ElapsedGameTime.Milliseconds * this.vitesseFrontale));
         }
 
-        private double[] GetProjectileAngle()
+        private double[] GetProjectileAngle(double angleBase)
         {
             switch (projectileCount)
             {
                 case 1:
-                    return new double[] { 0f };
+                    return new double[] { 0f + angleBase };
                 case 2:
                     return new double[] { 
-                        0f,
-                        0f
+                        0f + angleBase,
+                        0f + angleBase
                     };
                 case 3:
                     return new double[] { 
-                        0f,
-                        100f,
-                        -100f
+                        0f + angleBase,
+                        -(MathHelper.Pi / 4f) + angleBase,
+                        (MathHelper.Pi / 4f) + angleBase
                     };
                 default:
                     return new double[] {
-                        0f
+                        0f + angleBase
                     };
             }
         }

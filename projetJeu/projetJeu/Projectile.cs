@@ -120,7 +120,7 @@ namespace projetJeu
                     break;
                 case ProjectileType.smallFireShot:
                 case ProjectileType.blueEnergyBall:
-                    angle = Velocity.X != Speed.X ? angle = Velocity.Y < 0 ? 100 : -100 : 0f;
+                    angle = Velocity.X != Speed.X ? angle = Velocity.Y < 0f ? -(MathHelper.Pi / 4f) : (MathHelper.Pi / 4f) : 0f;
                     break;
                 default:
                     break;

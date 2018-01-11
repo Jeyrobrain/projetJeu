@@ -177,7 +177,7 @@ namespace projetJeu.Managers
             this.mainmenuImage = this.game.Content.Load<Texture2D>(@"ArrieresPlans\mainmenu.jpg");
 
             // Paramétrer la musique de fond et la démarrer.
-            MediaPlayer.Volume = 0.5f;         // pour mieux entendre les autres effets sonores
+            MediaPlayer.Volume = 0.05f;         // pour mieux entendre les autres effets sonores
             MediaPlayer.IsRepeating = true;
             MediaPlayer.Play(bruitageFond);
             MediaPlayer.Pause();
