@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,28 @@ namespace projetJeu.Managers
 
         private Texture2D mainmenuImage;
 
-        private List<Projectile> projectiles = new List<Projectile>();
+        private List<Projectile> listeProjectiles = new List<Projectile>();
+
+        /// <summary>
+        /// Effet sonore d'explosion d'astéroïde et de vaisseau.
+        /// </summary>
+        private static SoundEffect bruitageExplosion;
+
+        /// <summary>
+        /// Générateur de nombres aléatoires pour générer des explosions.
+        /// </summary>
+        private Random randomExplosions;
+
+        /// <summary>
+        /// Liste de gestion des particules d'explosions.
+        /// </summary>
+        private List<ParticuleExplosion> listeParticulesExplosions = new List<ParticuleExplosion>();
+
+        /// <summary>
+        /// Texture représentant une particule d'explosion d'astéroïdes.
+        /// </summary>
+        private Texture2D particulesExplosions;
+
 
         // Liste des sprites représentant des astéroïdes.
         private List<Sprite> listeEnnemis;
@@ -161,6 +183,9 @@ namespace projetJeu.Managers
             this.listeEnnemis = new List<Sprite>();
             this.randomEnnemis = new Random();
             this.probEnnemis = 0.01f;
+
+            // Créer les attributs de gestion des explosions.
+            this.randomExplosions = new Random();
         }
 
         public void LoadContent()
@@ -191,6 +216,10 @@ namespace projetJeu.Managers
 
             this.mainmenuImage = this.game.Content.Load<Texture2D>(@"ArrieresPlans\mainmenu.jpg");
 
+            // Charger les textures associées aux effets visuels gérées par Game.
+            this.particulesExplosions = this.game.Content.Load<Texture2D>(@"Explosions\explosionAsteroides");
+            bruitageExplosion = Content.Load<SoundEffect>(@"SoundFX\explosion001");
+
             // Paramétrer la musique de fond et la démarrer.
             MediaPlayer.Volume = 0.05f;         // pour mieux entendre les autres effets sonores
             MediaPlayer.IsRepeating = true;
@@ -205,9 +234,9 @@ namespace projetJeu.Managers
                 Projectile p = new Projectile(positions[i], projectileType);
                 p.Velocity = new Vector2((float)Math.Cos(angle[i]), (float)Math.Sin(angle[i])) * p.Speed;
                 p.Position += p.Velocity * 5f;
-                if (projectiles.Count() < 1000)
+                if (listeProjectiles.Count() < 1000)
                 {
-                    projectiles.Add(p);
+                    listeProjectiles.Add(p);
                 }
             }
         }
@@ -301,14 +330,14 @@ namespace projetJeu.Managers
                     this.vaisseauJoueur.Update(gameTime, this.graphics);
                     this.arrierePlanEspace.Update(gameTime, this.graphics);
 
-                    for (int i = 0; i < projectiles.Count; i++)
+                    for (int i = 0; i < listeProjectiles.Count; i++)
                     {
-                        Projectile p = projectiles[i];
+                        Projectile p = listeProjectiles[i];
                         p.Update(gameTime, this.graphics);
                         if (p.Position.X > this.graphics.GraphicsDevice.Viewport.Width ||
                             p.Position.X < 0f)
                         {
-                            projectiles.RemoveAt(i);
+                            listeProjectiles.RemoveAt(i);
                             i--;
                         }
                     }
@@ -343,6 +372,23 @@ namespace projetJeu.Managers
                 // Ajouter le sprite à la liste d'ennemis.
                 this.listeEnnemis.Add(ennemi);
             }
+
+            foreach (EnnemiSprite sprite in listeEnnemis)
+            {
+                if (sprite.Collision(vaisseauJoueur))
+                {
+                    this.Exit();
+                }
+            }
+
+            foreach (EnnemiSprite sprite in listeEnnemis)
+            {
+                foreach (Projectile projectile in listeProjectiles)
+                {
+                    if (sprite.Collision(projectile))
+                        this.Exit();
+                }
+            }
         }
 
         public void Draw(GameTime gameTime)
@@ -373,7 +419,7 @@ namespace projetJeu.Managers
                 // Afficher le sprite contrôlé par le joueur.
                 this.vaisseauJoueur.Draw(0f, this.camera, this.spriteBatch);
 
-                foreach (Projectile p in this.projectiles)
+                foreach (Projectile p in this.listeProjectiles)
                 {
                     p.Draw(p.angle, camera, spriteBatch);
                 }
