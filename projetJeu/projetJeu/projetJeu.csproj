@@ -39,6 +39,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ArrierePlanEspace.cs" />
+    <Compile Include="EnnemiSprite.cs" />
     <Compile Include="ClavierService.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Game.cs" />
@@ -77,6 +78,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\ArrieresPlans\seamless-space-purple.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Ennemi\base3n.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Ennemi\WB_baseu3_d0 - Copy.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Ennemi\WB_baseu3_d0.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Pipeline\Menus\Information.xml" />

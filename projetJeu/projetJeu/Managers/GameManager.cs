@@ -23,6 +23,15 @@ namespace projetJeu.Managers
 
         private List<Projectile> projectiles = new List<Projectile>();
 
+        // Liste des sprites représentant des astéroïdes.
+        private List<Sprite> listeEnnemis;
+
+        // Générateur de nombres aléatoires pour générer des astéroïdes.
+        private Random randomEnnemis;
+
+        // Probabilité de générer un astéroïde par cycle de Update().
+        private float probEnnemis;
+
         /// <summary>
         /// Attribut gérant l'affichage en batch à l'écran.
         /// </summary>
@@ -147,6 +156,11 @@ namespace projetJeu.Managers
             // car le setter de cette dernière manipule des effets sonores qui ne sont pas encore
             // chargées par LoadContent()
             this.etatJeu = Etats.Demarrer;
+
+            // Créer les attributs de gestion des ennemis.
+            this.listeEnnemis = new List<Sprite>();
+            this.randomEnnemis = new Random();
+            this.probEnnemis = 0.01f;
         }
 
         public void LoadContent()
@@ -161,6 +175,7 @@ namespace projetJeu.Managers
             JoueurSprite.LoadContent(this.game.Content, this.graphics);
             ArrierePlanEspace.LoadContent(this.game.Content, this.graphics);
             Projectile.LoadContent(this.game.Content, this.graphics);
+            EnnemiSprite.LoadContent(this.game.Content, this.graphics);
 
             // Créer les sprites du jeu. Premièrement le sprite du joueur centrer au bas de l'écran. On limite ensuite
             // ses déplacements à l'écran.
@@ -299,6 +314,35 @@ namespace projetJeu.Managers
                     }
                 }
             }
+
+            // Identifier les ennemis ayant quitté l'écran.
+            List<EnnemiSprite> ennemisFini = new List<EnnemiSprite>();
+            foreach (EnnemiSprite ennemi in this.listeEnnemis)
+                if (this.camera.EstADroite(ennemi.PositionRect))
+                    ennemisFini.Add(ennemi);
+
+            // Se débarrasser des ennemis ayant quitté l'écran.
+            foreach (EnnemiSprite ennemi in ennemisFini)
+                this.listeEnnemis.Remove(ennemi);
+
+            // Mettre à jour les ennemis existants.
+            foreach (EnnemiSprite ennemi in this.listeEnnemis)
+                ennemi.Update(gameTime, this.graphics);
+
+            // Déterminer si on doit créer un nouvel ennemi.
+            if (this.randomEnnemis.NextDouble() < this.probEnnemis)
+            {
+                // Créer le sprite ennemi
+                EnnemiSprite ennemi = new EnnemiSprite(0, 0);
+                // Positionner aléatoirement le sprite au haut de l'écran.
+                Random random = new Random();
+                ennemi.Position = new Vector2(this.graphics.GraphicsDevice.Viewport.Width + ennemi.Width / 2,
+                random.Next(this.graphics.GraphicsDevice.Viewport.Height));
+                // Aligner la vitesse de déplacement de l'ennemi avec celui de l'arrière-plan.
+                ennemi.VitesseDeplacement = this.arrierePlanEspace.VitesseArrierePlan;
+                // Ajouter le sprite à la liste d'ennemis.
+                this.listeEnnemis.Add(ennemi);
+            }
         }
 
         public void Draw(GameTime gameTime)
@@ -333,12 +377,17 @@ namespace projetJeu.Managers
                 {
                     p.Draw(p.angle, camera, spriteBatch);
                 }
+
+                // Afficher les ennemis.
+                foreach (EnnemiSprite ennemi in this.listeEnnemis)
+                    ennemi.Draw(0.0f, this.camera, this.spriteBatch);
             }
 
             if (fading)
             {
                 spriteBatch.Draw(_faderTexture, graphics.GraphicsDevice.Viewport.Bounds, new Color(Color.Black, (byte)MathHelper.Clamp(_faderAlpha, 0, 255)));
             }
+            
 
             this.spriteBatch.End();
         }
