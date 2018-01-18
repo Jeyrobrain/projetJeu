@@ -49,3 +49,9 @@
 #begin Pipeline/Menus/Information.xml
 /copy:Pipeline/Menus/Information.xml
 
+#begin Pipeline/SoundFX/explosion001.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Pipeline/SoundFX/explosion001.wav
+

@@ -217,8 +217,8 @@ namespace projetJeu.Managers
             this.mainmenuImage = this.game.Content.Load<Texture2D>(@"ArrieresPlans\mainmenu.jpg");
 
             // Charger les textures associées aux effets visuels gérées par Game.
-            this.particulesExplosions = this.game.Content.Load<Texture2D>(@"Explosions\explosionAsteroides");
-            bruitageExplosion = Content.Load<SoundEffect>(@"SoundFX\explosion001");
+            this.particulesExplosions = this.game.Content.Load<Texture2D>(@"Explosion\explosionAsteroides");
+            bruitageExplosion = this.game.Content.Load<SoundEffect>(@"Pipeline\SoundFX\explosion001");
 
             // Paramétrer la musique de fond et la démarrer.
             MediaPlayer.Volume = 0.05f;         // pour mieux entendre les autres effets sonores
@@ -373,11 +373,14 @@ namespace projetJeu.Managers
                 this.listeEnnemis.Add(ennemi);
             }
 
+            // Mettre à jour les particules d'explosion
+            this.UpdateParticulesExplosions(gameTime);
+
             foreach (EnnemiSprite sprite in listeEnnemis)
             {
                 if (sprite.Collision(vaisseauJoueur))
                 {
-                    this.Exit();
+                    this.CreerExplosion(sprite, particulesExplosions, gameTime);
                 }
             }
 
@@ -386,7 +389,17 @@ namespace projetJeu.Managers
                 foreach (Projectile projectile in listeProjectiles)
                 {
                     if (sprite.Collision(projectile))
-                        this.Exit();
+                    {
+                        Sprite cible = projectile.Collision(this.listeEnnemis);
+
+
+                            // Créer un nouvel effet visuel pour l'explosion.
+                            this.CreerExplosion(cible, this.particulesExplosions, gameTime);
+
+                            // Activer l'effet sonore de l'explosion.
+                            bruitageExplosion.Play();
+                        
+                    }     
                 }
             }
         }
@@ -436,6 +449,31 @@ namespace projetJeu.Managers
             
 
             this.spriteBatch.End();
+        }
+
+        protected void UpdateParticulesExplosions(GameTime gameTime)
+        {
+            // Liste de particules à détruire
+            List<ParticuleExplosion> particulesFinies = new List<ParticuleExplosion>();
+
+            // Mettre à jour les particules d'explosion
+            foreach (ParticuleExplosion particule in this.listeParticulesExplosions)
+            {
+                particule.Update(gameTime, this.graphics);
+
+                // Si la particule est devenue invisible, alors on peut l'ignorer à partir
+                // de maintenant
+                if (!particule.Visible)
+                {
+                    particulesFinies.Add(particule);
+                }
+            }
+
+            // Éliminer les particules ayant disparu de l'écran
+            foreach (ParticuleExplosion particule in particulesFinies)
+            {
+                this.listeParticulesExplosions.Remove(particule);
+            }
         }
 
         /// <summary>
@@ -503,6 +541,29 @@ namespace projetJeu.Managers
             _faderAlpha = 0f;
             _faderAlphaIncrement = 10;
             fading = true;
+        }
+
+        private List<ParticuleExplosion> CreerExplosion(Sprite sprite, Texture2D particuleTexture, GameTime gameTime)
+        {
+            // Liste des nouvelles particules
+            List<ParticuleExplosion> nouvellesParticules = new List<ParticuleExplosion>();
+
+            // Déterminer au hasard le nombre de particules pour représenter l'explosion
+            int nombreDeParticules = 10 + this.randomExplosions.Next(11);   // entre 10 et 20 particules
+
+            // Créer les particules et les ajouter à la liste de particules d'explosions à gérer
+            for (int i = 0; i < nombreDeParticules; i++)
+            {
+                ParticuleExplosion particule = new ParticuleExplosion(
+                    sprite.Position,                                 // positionné au départ sur le sprite
+                    particuleTexture,                                // texture à utiliser
+                    this.arrierePlanEspace.VitesseArrierePlan);      // vitesse de déplacement vertical
+
+                nouvellesParticules.Add(particule);
+                this.listeParticulesExplosions.Add(particule);
+            }
+
+            return nouvellesParticules;
         }
     }
 }

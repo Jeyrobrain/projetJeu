@@ -292,7 +292,7 @@ namespace IFM20884
         /// </summary>
         /// <param name="camera">Caméra indiquant la partie du monde présentement visible à l'écran (peut être nulle).</param>
         /// <param name="spriteBatch">Tampon d'affichage de sprites.</param>
-        public override void Draw(Camera camera, SpriteBatch spriteBatch)
+        public override void Draw(float angle, Camera camera, SpriteBatch spriteBatch)
         {
             if (this.Visible)
             {

@@ -305,6 +305,21 @@ namespace IFM20884
             return false;
         }
 
+        public virtual Sprite Collision(List<Sprite> cibles)
+        {
+            // Vérifier s'il y a collision avec chaque sprite de la liste donnée
+            foreach (Sprite sprite in cibles)
+            {
+                if (this.Collision(sprite))
+                {
+                    // Il y a collision avec this, alors on retourne le sprite l'ayant occasionné.
+                    return sprite;
+                }
+            }
+
+            return null;    // aucune collision détectée
+        }
+
         /// <summary>Fonction restreignant _position à l'intérieur des limites fournies par boundsRect si
         /// de telles limites sont fournies.
         /// </summary>

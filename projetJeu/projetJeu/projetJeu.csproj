@@ -56,6 +56,7 @@
     <Compile Include="ManetteService.cs" />
     <Compile Include="IFM20884\ItemDeMenu.cs" />
     <Compile Include="IFM20884\Menu.cs" />
+    <Compile Include="ParticuleExplosion.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Projectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -81,9 +82,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Ennemi\base3n.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Ennemi\WB_baseu3_d0 - Copy.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Ennemi\WB_baseu3_d0.png">
@@ -112,6 +110,12 @@
     <Content Include="Content\Vaisseau\shipSprite.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Explosion\explosionAsteroides.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Explosion\explosionVaisseau.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Icon.ico" />
     <Content Include="image\base3n.png" />
     <Content Include="image\WB_baseu3_d0.png" />
@@ -124,6 +128,7 @@
     <None Include="Content\Pipeline\Polices\PoliceItem.spritefont" />
     <None Include="Content\Pipeline\Polices\PoliceTitre.spritefont" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
