@@ -344,34 +344,8 @@ namespace projetJeu.Managers
                 }
             }
 
-            // Identifier les ennemis ayant quitté l'écran.
-            List<EnnemiSprite> ennemisFini = new List<EnnemiSprite>();
-            foreach (EnnemiSprite ennemi in this.listeEnnemis)
-                if (this.camera.EstADroite(ennemi.PositionRect))
-                    ennemisFini.Add(ennemi);
+            this.updateEnnemi(gameTime);
 
-            // Se débarrasser des ennemis ayant quitté l'écran.
-            foreach (EnnemiSprite ennemi in ennemisFini)
-                this.listeEnnemis.Remove(ennemi);
-
-            // Mettre à jour les ennemis existants.
-            foreach (EnnemiSprite ennemi in this.listeEnnemis)
-                ennemi.Update(gameTime, this.graphics);
-
-            // Déterminer si on doit créer un nouvel ennemi.
-            if (this.randomEnnemis.NextDouble() < this.probEnnemis)
-            {
-                // Créer le sprite ennemi
-                EnnemiSprite ennemi = new EnnemiSprite(0, 0);
-                // Positionner aléatoirement le sprite au haut de l'écran.
-                Random random = new Random();
-                ennemi.Position = new Vector2(this.graphics.GraphicsDevice.Viewport.Width + ennemi.Width / 2,
-                random.Next(this.graphics.GraphicsDevice.Viewport.Height));
-                // Aligner la vitesse de déplacement de l'ennemi avec celui de l'arrière-plan.
-                ennemi.VitesseDeplacement = this.arrierePlanEspace.VitesseArrierePlan;
-                // Ajouter le sprite à la liste d'ennemis.
-                this.listeEnnemis.Add(ennemi);
-            }
 
             // Mettre à jour les particules d'explosion
             this.UpdateParticulesExplosions(gameTime);
@@ -381,25 +355,6 @@ namespace projetJeu.Managers
                 if (sprite.Collision(vaisseauJoueur))
                 {
                     this.CreerExplosion(sprite, particulesExplosions, gameTime);
-                }
-            }
-
-            foreach (EnnemiSprite sprite in listeEnnemis)
-            {
-                foreach (Projectile projectile in listeProjectiles)
-                {
-                    if (sprite.Collision(projectile))
-                    {
-                        Sprite cible = projectile.Collision(this.listeEnnemis);
-
-
-                            // Créer un nouvel effet visuel pour l'explosion.
-                            this.CreerExplosion(cible, this.particulesExplosions, gameTime);
-
-                            // Activer l'effet sonore de l'explosion.
-                            bruitageExplosion.Play();
-                        
-                    }     
                 }
             }
         }
@@ -473,6 +428,41 @@ namespace projetJeu.Managers
             foreach (ParticuleExplosion particule in particulesFinies)
             {
                 this.listeParticulesExplosions.Remove(particule);
+            }
+        }
+
+        protected void updateEnnemi(GameTime gameTime)
+        {
+            // Identifier les ennemis ayant quitté l'écran.
+            List<EnnemiSprite> ennemisFini = new List<EnnemiSprite>();
+            foreach (EnnemiSprite ennemi in this.listeEnnemis)
+                if (this.camera.EstADroite(ennemi.PositionRect))
+                    ennemisFini.Add(ennemi);
+
+            // Se débarrasser des ennemis ayant quitté l'écran.
+            foreach (EnnemiSprite ennemi in ennemisFini)
+                this.listeEnnemis.Remove(ennemi);
+
+            // Mettre à jour les ennemis existants.
+            foreach (EnnemiSprite ennemi in this.listeEnnemis)
+                ennemi.Update(gameTime, this.graphics);
+
+            // Déterminer si on doit créer un nouvel ennemi.
+            if (this.randomEnnemis.NextDouble() < this.probEnnemis)
+            {
+                // Créer le sprite ennemi
+                EnnemiSprite ennemi = new EnnemiSprite(0, 0);
+
+                // Positionner aléatoirement le sprite au haut de l'écran.
+                Random random = new Random();
+                ennemi.Position = new Vector2(this.graphics.GraphicsDevice.Viewport.Width + ennemi.Width / 2,
+                random.Next(this.graphics.GraphicsDevice.Viewport.Height));
+
+                // Aligner la vitesse de déplacement de l'ennemi avec celui de l'arrière-plan.
+                ennemi.VitesseDeplacement = this.arrierePlanEspace.VitesseArrierePlan;
+
+                // Ajouter le sprite à la liste d'ennemis.
+                this.listeEnnemis.Add(ennemi);
             }
         }
 
