@@ -350,6 +350,41 @@ namespace projetJeu.Managers
             // Mettre à jour les particules d'explosion
             this.UpdateParticulesExplosions(gameTime);
 
+            List<Projectile> projectileFini = new List<Projectile>();
+
+            foreach (Projectile projectile in listeProjectiles)
+            {
+                /*foreach (EnnemiSprite ennemi in listeEnnemis)
+                {
+                    if (ennemi.Collision(projectile))
+                    {
+                        this.CreerExplosion(ennemi, particulesExplosions, gameTime);
+                    }
+                }*/
+                // Premièrement, est-ce que l'obus a touché un astéroïde?
+                Sprite cible = projectile.Collision(this.listeEnnemis);
+
+                // Si oui, détruire les deux sprites impliqués et produire une explosion
+                if (cible != null && projectile.Position != cible.Position)
+                {
+                    // Détruire la cible et l'obus.
+                    this.listeEnnemis.Remove(cible);
+                    projectileFini.Add(projectile);
+
+                    // Créer un nouvel effet visuel pour l'explosion.
+                    this.CreerExplosion(cible, this.particulesExplosions, gameTime);
+
+                    // Activer l'effet sonore de l'explosion.
+                    bruitageExplosion.Play();
+                }
+            }
+
+            // Se débarasser des obus n'étant plus d'aucune utilité.
+            foreach (Projectile projectile in projectileFini)
+            {
+                this.listeProjectiles.Remove(projectile);
+            }
+
             foreach (EnnemiSprite sprite in listeEnnemis)
             {
                 if (sprite.Collision(vaisseauJoueur))
@@ -363,7 +398,6 @@ namespace projetJeu.Managers
         {
             this.graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // À FAIRE: Ajoutez votre code d'affichage ici.
             this.spriteBatch.Begin();
 
             if (EtatJeu == Etats.Demarrer || EtatJeu == Etats.Info)
@@ -395,6 +429,12 @@ namespace projetJeu.Managers
                 // Afficher les ennemis.
                 foreach (EnnemiSprite ennemi in this.listeEnnemis)
                     ennemi.Draw(0.0f, this.camera, this.spriteBatch);
+
+                // Afficher les explosions
+                foreach (ParticuleExplosion particule in this.listeParticulesExplosions)
+                {
+                    particule.Draw(0.0f, this.camera, this.spriteBatch);
+                }
             }
 
             if (fading)
