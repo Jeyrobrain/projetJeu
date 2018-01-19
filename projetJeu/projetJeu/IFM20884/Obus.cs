@@ -76,6 +76,7 @@ namespace IFM20884
         /// Vitesses de propulsion de l'obus lors du tir.
         /// </summary>
         private Vector2 vitessesPropulsion;
+        private Vector2 vitesseBase;
 
         /// <summary>
         /// Sprite à l'origine du tir.
@@ -98,15 +99,15 @@ namespace IFM20884
             switch (projectileType)
             {
                 case ProjectileType.smallFireShot:
-                    this.vitessesPropulsion = new Vector2(0.6f, 0);
+                    this.vitesseBase = new Vector2(2.5f, 2.5f);
                     this.damage = 1;
                     break;
                 case ProjectileType.blueEnergyBall:
-                    this.vitessesPropulsion = new Vector2(0.01f, 0);
+                    this.vitesseBase = new Vector2(3.5f, 3.5f);
                     this.damage = 5;
                     break;
                 case ProjectileType.disque:
-                    this.vitessesPropulsion = new Vector2(0.2f, 0);
+                    this.vitesseBase = new Vector2(3.5f, 3.5f);
                     this.damage = 10;
                     break;
             }
@@ -181,6 +182,8 @@ namespace IFM20884
             {
                 this.VitessesPropulsion *= -1f;
             }
+
+            VitessesPropulsion /= vitesseBase;
 
             // Déplacer le vaisseau en fonction des vitesses latérales et frontales
             this.Position = new Vector2(
