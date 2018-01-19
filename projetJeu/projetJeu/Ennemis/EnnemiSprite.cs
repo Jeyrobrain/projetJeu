@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="ArrierePlanEspace.cs" company="Marco Lavoie">
+// <copyright file="EnnemiSprite.cs" company="Marco Lavoie">
 // Marco Lavoie, 2010-2016. Tous droits réservés
 // 
 // L'utilisation de ce matériel pédagogique (présentations, code source 
@@ -30,6 +30,7 @@
 // En utilisant ce matériel pédagogique, vous acceptez implicitement les
 // conditions et la décharge exprimés ci-dessus.
 // </copyright>
+// <summary>Implantation de la classe EnnemiSprite.</summary>
 //-----------------------------------------------------------------------
 
 namespace projetJeu
@@ -44,59 +45,65 @@ namespace projetJeu
     using Microsoft.Xna.Framework;
     using Microsoft.Xna.Framework.Content;
     using Microsoft.Xna.Framework.Graphics;
+    using Microsoft.Xna.Framework.Input;
+    using projetJeu.Managers;
+
 
     /// <summary>
-    /// Classe implantant l'arrière plan du jeu dans l'espace.
+    /// Classe implantant le sprite représentant un astéroïde en rotation.
     /// </summary>
-    public class ArrierePlanEspace : DefilementArrierePlan
+    public abstract class EnnemiSprite : Sprite
     {
-        /// <summary>
-        /// Attribut statique contenant la texture de l'espace.
-        /// </summary>
-        private static List<Texture2D> textures = new List<Texture2D>();
+        public delegate void Shoot(Obus obus, bool isPlayer = false);
+        public delegate float AngleToPlayer(Sprite source);
 
-        public static TextureType textureType;
-
-        public enum TextureType
+        private Shoot shootObus;
+        public Shoot ShootObus
         {
-            blue, 
-            orange,
-            purple,
+            get { return shootObus; }
+            set { this.shootObus = value; }
+        }
+
+        private AngleToPlayer angleToPlayer;
+        public AngleToPlayer GetAngleToPlayer
+        {
+            get { return this.angleToPlayer; }
+            set { this.angleToPlayer = value; }
+        }
+
+        private int health;
+        public int Health
+        {
+            get { return health; }
+            set { health = value; }
+        }
+
+        public EnnemiSprite(Vector2 pos)
+            : base(pos)
+        {
+
+        }
+
+        public EnnemiSprite(float x, float y)
+            : this(new Vector2(x, y))
+        {
+
         }
 
         /// <summary>
-        /// Constructeur paramétré recevant un GraphicsDeviceManager afin de centrer l'image dans l'écran.
+        /// Vitesse de déplacement verticale du sprite.
         /// </summary>
-        /// <param name="graphics">Gestionanire de périphérique d'affichage permettant d'extraire
-        /// les caractéristiques de celui-ci (p.ex. l'écran).</param>
-        public ArrierePlanEspace(GraphicsDeviceManager graphics)
-            : base(graphics) 
-        {
-            textureType = TextureType.purple;
-        }
+        private float vitesseDeplacement;
 
         /// <summary>
-        /// Accesseur public de l'attribut privé texture. Cette surcharge est requise pour
-        /// avoir l'autorisation d'instancier la classe.
+        /// Propriété (accesseur pour vitesseDeplacement) retournant ou changeant la vitesse de déplacement 
+        /// verticale du sprite.
         /// </summary>
-        public override Texture2D Texture
+        /// <value>Position du sprite.</value>
+        public float VitesseDeplacement
         {
-            get { return textures[(int)textureType]; }
-        }
-
-        /// <summary>
-        /// Fonction membre statique chargeant les ressources associées au sprite.
-        /// </summary>
-        /// <param name="content">Gestionnaire de contenu permettant de charger l'image
-        /// d'arrière plan.</param>
-        /// <param name="graphics">Gestionanire de périphérique d'affichage permettant d'extraire
-        /// les caractéristiques de celui-ci (p.ex. l'écran).</param>
-        public static void LoadContent(ContentManager content, GraphicsDeviceManager graphics)
-        {
-            // Charger la texture d'arrière plan et la positionner au centre de l'écran
-            textures.Add(content.Load<Texture2D>(@"ArrieresPlans\seamless-space-blue"));
-            textures.Add(content.Load<Texture2D>(@"ArrieresPlans\seamless-space-orange"));
-            textures.Add(content.Load<Texture2D>(@"ArrieresPlans\seamless-space-purple"));
+            get { return this.vitesseDeplacement; }
+            set { this.vitesseDeplacement = value; }
         }
     }
 }

@@ -253,7 +253,7 @@ namespace IFM20884
         public override void Update(GameTime gameTime, GraphicsDeviceManager graphics)
         {
             // Premièrement décaler la particule vers le bas en fonction de sa vitesse.
-            this.Position = new Vector2(Position.X, Position.Y + (gameTime.ElapsedGameTime.Milliseconds * this.vitesseDeplacement));
+            this.Position = new Vector2(Position.X - (gameTime.ElapsedGameTime.Milliseconds * this.vitesseDeplacement), Position.Y);
 
             // Mettre à jour la rotation de la texture.
             this.rotation += this.rotationVitesse;
@@ -292,7 +292,7 @@ namespace IFM20884
         /// </summary>
         /// <param name="camera">Caméra indiquant la partie du monde présentement visible à l'écran (peut être nulle).</param>
         /// <param name="spriteBatch">Tampon d'affichage de sprites.</param>
-        public override void Draw(float angle, Camera camera, SpriteBatch spriteBatch)
+        public override void Draw(float angle, Camera camera, SpriteBatch spriteBatch, SpriteEffects effects = SpriteEffects.None)
         {
             if (this.Visible)
             {
@@ -317,7 +317,7 @@ namespace IFM20884
                         camera.Monde2Camera(ref destRect);
                     }
 
-                    spriteBatch.Draw(this.Texture, pos, null, fadeColor, this.rotation, new Vector2(this.Texture.Width / 2, this.Texture.Height / 2), this.echelle, SpriteEffects.None, 1);
+                    spriteBatch.Draw(this.Texture, pos, null, fadeColor, this.rotation, new Vector2(this.Texture.Width / 2, this.Texture.Height / 2), this.echelle, effects, 1);
                 }
             }
         }

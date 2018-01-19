@@ -46,31 +46,18 @@ namespace projetJeu
     using Microsoft.Xna.Framework.Content;
     using Microsoft.Xna.Framework.Graphics;
     using Microsoft.Xna.Framework.Input;
+    using projetJeu.Managers;
+
 
     /// <summary>
     /// Classe implantant le sprite représentant un astéroïde en rotation.
     /// </summary>
-    public class EnnemiSprite : Sprite
+    public class EnnemiShip : EnnemiSprite
     {
         /// <summary>
         /// Attribut statique contenant la texture de l'astéroïde.
         /// </summary>
-        private static Texture2D ennemi;
-
-        /// <summary>
-        /// Vitesse de déplacement verticale du sprite.
-        /// </summary>
-        private float vitesseDeplacement;
-
-        /// <summary>
-        /// Angle de rotation courante du sprite.
-        /// </summary>
-        private float angleRotation;
-
-        /// <summary>
-        /// Contrôle de vitesse de rotation du sprite.
-        /// </summary>
-        private float vitesseRotation;
+        private static Texture2D texture;
 
         /// <summary>
         /// Contrôle d'échelle de dimensionnement du sprite.
@@ -82,19 +69,21 @@ namespace projetJeu
         /// </summary>
         /// <param name="x">Position en x du sprite.</param>
         /// <param name="y">Position en y du sprite.</param>
-        public EnnemiSprite(float x, float y)
+        public EnnemiShip(float x, float y)
             : base(x, y)
         {
             this.Initialize();
+            this.Health =  6 ;
         }
 
         /// <summary>
         /// Initialise une nouvelle instance de la classe EnnemiSprite.
         /// </summary>
         /// <param name="position">Position du sprite.</param>
-        public EnnemiSprite(Vector2 position)
+        public EnnemiShip(Vector2 position)
             : this(position.X, position.Y)
         {
+
         }
 
         /// <summary>
@@ -103,18 +92,7 @@ namespace projetJeu
         /// </summary>
         public override Texture2D Texture
         {
-            get { return ennemi; }
-        }
-
-        /// <summary>
-        /// Propriété (accesseur pour vitesseDeplacement) retournant ou changeant la vitesse de déplacement 
-        /// verticale du sprite.
-        /// </summary>
-        /// <value>Position du sprite.</value>
-        public float VitesseDeplacement
-        {
-            get { return this.vitesseDeplacement; }
-            set { this.vitesseDeplacement = value; }
+            get { return texture; }
         }
 
         /// <summary>
@@ -125,7 +103,7 @@ namespace projetJeu
         public static void LoadContent(ContentManager content, GraphicsDeviceManager graphics)
         {
             // Charger la texture de l'astéroïde.
-            ennemi = content.Load<Texture2D>("Ennemi/WB_baseu3_d0.png");
+            texture = content.Load<Texture2D>("Ennemi/ennemi-ship.png");
         }
 
         /// <summary>
@@ -134,19 +112,15 @@ namespace projetJeu
         public void Initialize()
         {
             // Vitesse de déplacement vertical par défaut.
-            this.vitesseDeplacement = 0.2f;
-
-            // Angle initial de rotation (i.e. aucun)
-            this.angleRotation = 0.0f;
-
-            // Attribuer une vitesse de rotation aléatoire entre -0.002 et +0.002.
-            Random random = new Random();
-            this.vitesseRotation = -0.002f + (float)(random.NextDouble() * 0.004f);
+            this.VitesseDeplacement = 0.2f;
 
             // Attribuer un facteur d'échelle aléatoire entre 0.5 et 2.0.
             //this.echelle = 0.5f + (float)(random.NextDouble() * 1.5f);
             this.echelle = 1f;
         }
+
+        private float delay = 1.5f;
+        private float remainingDelay = 1f;
 
         /// <summary>
         /// Fonction membre abstraite mettant à jour le sprite selon les touches de clavier pressées.
@@ -157,10 +131,20 @@ namespace projetJeu
         public override void Update(GameTime gameTime, GraphicsDeviceManager graphics)
         {
             // Décaler l'ennemi vers la gauche.
-            this.Position = new Vector2(Position.X - (gameTime.ElapsedGameTime.Milliseconds * this.vitesseDeplacement), Position.Y);
+            this.Position = new Vector2(Position.X - (gameTime.ElapsedGameTime.Milliseconds * this.VitesseDeplacement), Position.Y);
 
-            this.angleRotation += gameTime.ElapsedGameTime.Milliseconds * this.vitesseRotation;
-            this.angleRotation %= MathHelper.Pi * 2;
+            float timer = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            remainingDelay -= timer;
+
+            Vector2 projectilePos = new Vector2(this.Position.X - (this.Width / 2), this.Position.Y);
+
+            if (remainingDelay <= 0)
+            {
+                remainingDelay = delay;
+                Obus obus = new Obus(projectilePos, ProjectileType.blueEnergyBall, angle: GetAngleToPlayer(this), isEnnemi: true);
+                obus.Source = this;
+                this.ShootObus(obus);
+            }
         }
 
         /// <summary>
@@ -169,12 +153,12 @@ namespace projetJeu
         /// </summary>
         /// <param name="camera">Caméra indiquant la partie du monde présentement visible à l'écran.</param>
         /// <param name="spriteBatch">Tampon d'affichage de sprites.</param>
-        public override void Draw(float angle, Camera camera, SpriteBatch spriteBatch)
+        public override void Draw(float angle, Camera camera, SpriteBatch spriteBatch, SpriteEffects effects = SpriteEffects.None)
         {
             // Le point autour duquel apliquer la rotation est le centre de la texture.
             Vector2 origine = new Vector2(this.Width / 2, this.Height / 2);
 
-            spriteBatch.Draw(this.Texture, this.Position, null, Color.White, this.angleRotation, origine, this.echelle, SpriteEffects.None, 0f);
+            spriteBatch.Draw(this.Texture, this.Position, null, Color.White, 0f, origine, this.echelle, effects, 0f);
             //spriteBatch.Draw(this.Texture, destinationRectangle: base.PositionRect, rotation: this.angleRotation);
         }
     }

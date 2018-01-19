@@ -4,3 +4,9 @@
     smallFireShot,
     blueEnergyBall,
 }
+
+public enum EnnemiType
+{
+    ship,
+    spinner
+}

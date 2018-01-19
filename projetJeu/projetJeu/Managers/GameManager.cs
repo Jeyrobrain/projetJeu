@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace projetJeu.Managers
 {
@@ -22,7 +23,10 @@ namespace projetJeu.Managers
 
         private Texture2D mainmenuImage;
 
-        private List<Projectile> listeProjectiles = new List<Projectile>();
+        private List<Obus> listeObusJoueur = new List<Obus>();
+        private List<Obus> listeObusEnnemis = new List<Obus>();
+
+        private List<Obus> obusFini = new List<Obus>();
 
         /// <summary>
         /// Effet sonore d'explosion d'astéroïde et de vaisseau.
@@ -44,15 +48,18 @@ namespace projetJeu.Managers
         /// </summary>
         private Texture2D particulesExplosions;
 
-
         // Liste des sprites représentant des astéroïdes.
         private List<Sprite> listeEnnemis;
+
+        private List<Sprite> listeEnnemisFini = new List<Sprite>();
 
         // Générateur de nombres aléatoires pour générer des astéroïdes.
         private Random randomEnnemis;
 
         // Probabilité de générer un astéroïde par cycle de Update().
         private float probEnnemis;
+
+        private float probEnnemiType;
 
         /// <summary>
         /// Attribut gérant l'affichage en batch à l'écran.
@@ -182,7 +189,8 @@ namespace projetJeu.Managers
             // Créer les attributs de gestion des ennemis.
             this.listeEnnemis = new List<Sprite>();
             this.randomEnnemis = new Random();
-            this.probEnnemis = 0.01f;
+            this.probEnnemis = 0.02f;
+            this.probEnnemiType = 0.35f;
 
             // Créer les attributs de gestion des explosions.
             this.randomExplosions = new Random();
@@ -199,14 +207,15 @@ namespace projetJeu.Managers
             // Charger les sprites.
             JoueurSprite.LoadContent(this.game.Content, this.graphics);
             ArrierePlanEspace.LoadContent(this.game.Content, this.graphics);
-            Projectile.LoadContent(this.game.Content, this.graphics);
-            EnnemiSprite.LoadContent(this.game.Content, this.graphics);
+            Obus.LoadContent(this.game.Content, this.graphics);
+            EnnemiShip.LoadContent(this.game.Content, this.graphics);
+            EnnemiSpinner.LoadContent(this.game.Content, this.graphics);
 
             // Créer les sprites du jeu. Premièrement le sprite du joueur centrer au bas de l'écran. On limite ensuite
             // ses déplacements à l'écran.
             this.vaisseauJoueur = new JoueurSprite(this.graphics.GraphicsDevice.Viewport.Width / 8f, this.graphics.GraphicsDevice.Viewport.Height / 2f);
             this.vaisseauJoueur.BoundsRect = new Rectangle(0, 0, this.graphics.GraphicsDevice.Viewport.Width, this.graphics.GraphicsDevice.Viewport.Height);
-            this.vaisseauJoueur.ShootProjectile += Shoot;
+            this.vaisseauJoueur.ShootObus += Shoot;
 
             // Créer ensuite les sprites représentant les arrière-plans.
             this.arrierePlanEspace = new ArrierePlanEspace(this.graphics);
@@ -227,17 +236,15 @@ namespace projetJeu.Managers
             MediaPlayer.Pause();
         }
 
-        private void Shoot(Vector2[] positions, double[] angle, ProjectileType projectileType)
+        private void Shoot(Obus obus, bool isPlayer)
         {
-            for (int i = 0; i < MathHelper.Clamp(positions.Length, 1, 3); i++)
+            if (isPlayer)
             {
-                Projectile p = new Projectile(positions[i], projectileType);
-                p.Velocity = new Vector2((float)Math.Cos(angle[i]), (float)Math.Sin(angle[i])) * p.Speed;
-                p.Position += p.Velocity * 5f;
-                if (listeProjectiles.Count() < 1000)
-                {
-                    listeProjectiles.Add(p);
-                }
+                listeObusJoueur.Add(obus);
+            }
+            else
+            {
+                listeObusEnnemis.Add(obus);
             }
         }
 
@@ -289,7 +296,7 @@ namespace projetJeu.Managers
                 }
                 else
                 {
-                    if (switchScenes &&  this.nextEtatJeu == Etats.Demarrer)
+                    if (switchScenes && this.nextEtatJeu == Etats.Demarrer)
                     {
                         switchScenes = false;
                         this.EtatJeu = nextEtatJeu;
@@ -330,67 +337,131 @@ namespace projetJeu.Managers
                     this.vaisseauJoueur.Update(gameTime, this.graphics);
                     this.arrierePlanEspace.Update(gameTime, this.graphics);
 
-                    for (int i = 0; i < listeProjectiles.Count; i++)
+                    this.updateEnnemi(gameTime);
+
+                    // Mettre à jour les obus
+                    this.UpdateObus(gameTime);
+
+                    // Mettre à jour les particules d'explosion
+                    this.UpdateParticulesExplosions(gameTime);
+
+                    foreach (EnnemiSprite sprite in listeEnnemis)
                     {
-                        Projectile p = listeProjectiles[i];
-                        p.Update(gameTime, this.graphics);
-                        if (p.Position.X > this.graphics.GraphicsDevice.Viewport.Width ||
-                            p.Position.X < 0f)
+                        bool collision = sprite.Collision(vaisseauJoueur);
+
+                        if (collision)
                         {
-                            listeProjectiles.RemoveAt(i);
-                            i--;
+                            this.listeEnnemisFini.Add(sprite);
+                            this.CreerExplosion(sprite, particulesExplosions, gameTime);
+                            bruitageExplosion.Play(0.25f, 0f, 0f);
                         }
+                    }
+
+                    foreach (EnnemiSprite s in listeEnnemisFini)
+                    {
+                        listeEnnemis.Remove(s);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Routine mettant à jour les obus. Elle s'occupe de:
+        ///   1 - Détruire les obus ayant quitté l'écran sans collision
+        ///   2 - Déterminer si un des obus a frappé un sprite, et si c'est le cas
+        ///       détruire les deux sprites (probablement un astéroïde)
+        ///   3 - Mettre à jour la position des obus existants.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        protected void UpdateObus(GameTime gameTime)
+        {
+            // Identifier les obus ayant quitté l'écran.
+            foreach (Obus obus in this.listeObusJoueur)
+            {
+                if (obus.Position.X + obus.Width > this.graphics.GraphicsDevice.Viewport.Width ||
+                    obus.Position.X < 0 ||
+                    obus.Position.Y < 0 ||
+                    obus.Position.Y - obus.Height > this.graphics.GraphicsDevice.Viewport.Height)
+                {
+                    obusFini.Add(obus);
+                }
+            }
+
+            foreach (Obus obus in this.listeObusEnnemis)
+            {
+                if (obus.Position.X + obus.Width > this.graphics.GraphicsDevice.Viewport.Width ||
+                    obus.Position.X < 0 ||
+                    obus.Position.Y < 0 ||
+                    obus.Position.Y - obus.Height > this.graphics.GraphicsDevice.Viewport.Height)
+                {
+                    obusFini.Add(obus);
+                }
+            }
+
+            // Determiner si un obus a frappé un astéroïde, et si c'est le cas détruire les deux sprites.
+            foreach (Obus obus in this.listeObusJoueur)
+            {
+                // Premièrement, est-ce que l'obus a touché un astéroïde?
+                EnnemiSprite cible = (EnnemiSprite)obus.Collision(this.listeEnnemis);
+                // Si oui, détruire les deux sprites impliqués et produire une explosion
+                if (cible != null && obus.Source != cible)
+                {
+                    cible.Health -= obus.Damage;
+                    obusFini.Add(obus);
+                    if (cible.Health < 1)
+                    {
+                        // Détruire la cible.
+                        this.listeEnnemis.Remove(cible);
+
+                        // Créer un nouvel effet visuel pour l'explosion.
+                        this.CreerExplosion(cible, this.particulesExplosions, gameTime);
+
+                        // Activer l'effet sonore de l'explosion.
+                        bruitageExplosion.Play(0.25f, 0f, 0f);
                     }
                 }
             }
 
-            this.updateEnnemi(gameTime);
-
-
-            // Mettre à jour les particules d'explosion
-            this.UpdateParticulesExplosions(gameTime);
-
-            List<Projectile> projectileFini = new List<Projectile>();
-
-            foreach (Projectile projectile in listeProjectiles)
+            foreach (Obus obus in this.listeObusEnnemis)
             {
-                /*foreach (EnnemiSprite ennemi in listeEnnemis)
+                if (!vaisseauJoueur.estFrapper && obus.Collision(this.vaisseauJoueur) && obus.Source != vaisseauJoueur)
                 {
-                    if (ennemi.Collision(projectile))
-                    {
-                        this.CreerExplosion(ennemi, particulesExplosions, gameTime);
-                    }
-                }*/
-                // Premièrement, est-ce que l'obus a touché un astéroïde?
-                Sprite cible = projectile.Collision(this.listeEnnemis);
+                    vaisseauJoueur.estFrapper = true;
 
-                // Si oui, détruire les deux sprites impliqués et produire une explosion
-                if (cible != null && projectile.Position != cible.Position)
-                {
                     // Détruire la cible et l'obus.
-                    this.listeEnnemis.Remove(cible);
-                    projectileFini.Add(projectile);
+                    //this.listeEnnemis.Remove(cible);
+                    obusFini.Add(obus);
 
                     // Créer un nouvel effet visuel pour l'explosion.
-                    this.CreerExplosion(cible, this.particulesExplosions, gameTime);
+                    this.CreerExplosion(vaisseauJoueur, this.particulesExplosions, gameTime);
 
                     // Activer l'effet sonore de l'explosion.
-                    bruitageExplosion.Play();
+                    bruitageExplosion.Play(0.25f, 0f, 0f);
                 }
             }
 
             // Se débarasser des obus n'étant plus d'aucune utilité.
-            foreach (Projectile projectile in projectileFini)
+            foreach (Obus obus in obusFini)
             {
-                this.listeProjectiles.Remove(projectile);
+                if (obus.Source == vaisseauJoueur)
+                {
+                    this.listeObusJoueur.Remove(obus);
+                }
+                else
+                {
+                    this.listeObusEnnemis.Remove(obus);
+                }
             }
 
-            foreach (EnnemiSprite sprite in listeEnnemis)
+            // Mettre à jour les obus existants.
+            foreach (Obus obus in this.listeObusJoueur)
             {
-                if (sprite.Collision(vaisseauJoueur))
-                {
-                    this.CreerExplosion(sprite, particulesExplosions, gameTime);
-                }
+                obus.Update(gameTime, this.graphics);
+            }
+
+            foreach (Obus obus in this.listeObusEnnemis)
+            {
+                obus.Update(gameTime, this.graphics);
             }
         }
 
@@ -421,19 +492,24 @@ namespace projetJeu.Managers
                 // Afficher le sprite contrôlé par le joueur.
                 this.vaisseauJoueur.Draw(0f, this.camera, this.spriteBatch);
 
-                foreach (Projectile p in this.listeProjectiles)
+                foreach (Obus obus in listeObusJoueur)
                 {
-                    p.Draw(p.angle, camera, spriteBatch);
+                    obus.Draw(obus.Angle, this.camera, this.spriteBatch);
+                }
+
+                foreach (Obus obus in listeObusEnnemis)
+                {
+                    obus.Draw(obus.Angle, this.camera, this.spriteBatch, SpriteEffects.FlipHorizontally);
                 }
 
                 // Afficher les ennemis.
                 foreach (EnnemiSprite ennemi in this.listeEnnemis)
-                    ennemi.Draw(0.0f, this.camera, this.spriteBatch);
+                    ennemi.Draw(0f, this.camera, this.spriteBatch);
 
                 // Afficher les explosions
                 foreach (ParticuleExplosion particule in this.listeParticulesExplosions)
                 {
-                    particule.Draw(0.0f, this.camera, this.spriteBatch);
+                    particule.Draw(0f, this.camera, this.spriteBatch);
                 }
             }
 
@@ -490,11 +566,25 @@ namespace projetJeu.Managers
             // Déterminer si on doit créer un nouvel ennemi.
             if (this.randomEnnemis.NextDouble() < this.probEnnemis)
             {
-                // Créer le sprite ennemi
-                EnnemiSprite ennemi = new EnnemiSprite(0, 0);
+                Random random = new Random();
+
+                EnnemiSprite ennemi = null;
+
+                if (random.NextDouble() < probEnnemiType)
+                {
+                    ennemi = new EnnemiShip(0, 0);
+                }
+                else
+                {
+                    ennemi = new EnnemiSpinner(0, 0);
+                }
+
+                if (ennemi == null) return;
+                
+                ennemi.ShootObus += Shoot;
+                ennemi.GetAngleToPlayer += AngleToPlayer;
 
                 // Positionner aléatoirement le sprite au haut de l'écran.
-                Random random = new Random();
                 ennemi.Position = new Vector2(this.graphics.GraphicsDevice.Viewport.Width + ennemi.Width / 2,
                 random.Next(this.graphics.GraphicsDevice.Viewport.Height));
 
@@ -594,6 +684,19 @@ namespace projetJeu.Managers
             }
 
             return nouvellesParticules;
+        }
+
+        public float AngleToPlayer(Sprite source)
+        {
+            float angle = (float)Math.Atan2(source.Position.Y - this.vaisseauJoueur.Position.Y, source.Position.X - this.vaisseauJoueur.Position.X);
+            if (this.vaisseauJoueur.Position.X > source.Position.X - source.Width / 2)
+            {
+                return 0f;
+            }
+            else
+            {
+                return angle;
+            }
         }
     }
 }

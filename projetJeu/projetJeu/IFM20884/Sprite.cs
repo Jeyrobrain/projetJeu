@@ -208,7 +208,7 @@ namespace IFM20884
         /// </summary>
         /// <param name="camera">Caméra indiquant la partie du monde présentement visible à l'écran (peut être nulle).</param>
         /// <param name="spriteBatch">Gestionnaire d'affichage en batch aux périphériques.</param>
-        public virtual void Draw(float angle, Camera camera, SpriteBatch spriteBatch)
+        public virtual void Draw(float angle, Camera camera, SpriteBatch spriteBatch, SpriteEffects effects = SpriteEffects.None)
         {
             // On doit travailler avec une copie de PositionRect car on va mapper ses coordonnées
             // en celles du monde si on nous a fourni une caméra.
@@ -224,7 +224,7 @@ namespace IFM20884
                 }
 
                 // Afficher le sprite.
-                spriteBatch.Draw(this.Texture, destinationRectangle: destRect, rotation: angle);
+                spriteBatch.Draw(this.Texture, destinationRectangle: destRect, rotation: angle, effects: effects);
             }
         }
 

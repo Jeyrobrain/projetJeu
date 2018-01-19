@@ -106,16 +106,16 @@ namespace IFM20884
         /// </summary>
         /// <param name="camera">Caméra indiquant la partie du monde présentement visible à l'écran.</param>
         /// <param name="spriteBatch">Gestionnaire d'affichage en batch aux périphériques.</param>
-        public override void Draw(float angle, Camera camera, SpriteBatch spriteBatch)
+        public override void Draw(float angle, Camera camera, SpriteBatch spriteBatch, SpriteEffects effects = SpriteEffects.None)
         {
             // La texture est affichée deux fois : une première fois au dessus de sa position
             // actuelle (ne pas oublier que le sprite est centrée sur _position).
             this.Position = new Vector2(this.Position.X - Width, this.Position.Y);
-            base.Draw(angle, camera, spriteBatch);
+            base.Draw(angle, camera, spriteBatch, effects);
 
             // Et une seconde fois à sa position actuelle
             this.Position = new Vector2(this.Position.X + Width, this.Position.Y);
-            base.Draw(angle, camera, spriteBatch);
+            base.Draw(angle, camera, spriteBatch, effects);
         }
     }
 }
