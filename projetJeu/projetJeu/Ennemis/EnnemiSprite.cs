@@ -64,6 +64,13 @@ namespace projetJeu
             set { this.shootObus = value; }
         }
 
+        private static Texture2D redPixel, greenPixel;
+
+        /// <summary>
+        /// Contrôle d'échelle de dimensionnement du sprite.
+        /// </summary>
+        protected float echelle;
+
         private AngleToPlayer angleToPlayer;
         public AngleToPlayer GetAngleToPlayer
         {
@@ -71,12 +78,14 @@ namespace projetJeu
             set { this.angleToPlayer = value; }
         }
 
-        private int health;
-        public int Health
+        private float health;
+        public float Health
         {
             get { return health; }
             set { health = value; }
         }
+
+        protected float maxHealth;
 
         public EnnemiSprite(Vector2 pos)
             : base(pos)
@@ -88,6 +97,14 @@ namespace projetJeu
             : this(new Vector2(x, y))
         {
 
+        }
+
+        public static void Initialize(GraphicsDevice gdm)
+        {
+            redPixel = new Texture2D(gdm, 1, 1);
+            redPixel.SetData<Color>(new[] { Color.Red });
+            greenPixel = new Texture2D(gdm, 1, 1);
+            greenPixel.SetData<Color>(new[] { Color.Green });
         }
 
         /// <summary>
@@ -104,6 +121,27 @@ namespace projetJeu
         {
             get { return this.vitesseDeplacement; }
             set { this.vitesseDeplacement = value; }
+        }
+
+        public override void Draw(float angle, Camera camera, SpriteBatch spriteBatch, SpriteEffects effects = SpriteEffects.None)
+        {
+            base.Draw(angle, camera, spriteBatch, effects);
+        }
+
+        public void DrawHealth(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(redPixel, 
+                             new Rectangle((int)this.Position.X - this.Width / 2, 
+                                           (int)this.Position.Y - this.Height / 2 - this.Height / 4, 
+                                                this.Width, 
+                                                5), 
+                             Color.White);
+
+            spriteBatch.Draw(
+                greenPixel,
+                position: new Vector2(this.Position.X - this.Width / 2 - 1f, this.Position.Y - this.Height / 2 - this.Height / 4),
+                scale: new Vector2((this.Width + 1f) / (this.maxHealth / this.health), 5f),
+                color: Color.White);
         }
     }
 }

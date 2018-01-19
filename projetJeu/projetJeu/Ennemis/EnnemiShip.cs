@@ -60,11 +60,6 @@ namespace projetJeu
         private static Texture2D texture;
 
         /// <summary>
-        /// Contrôle d'échelle de dimensionnement du sprite.
-        /// </summary>
-        private float echelle;
-
-        /// <summary>
         /// Initialise une nouvelle instance de la classe EnnemiSprite.
         /// </summary>
         /// <param name="x">Position en x du sprite.</param>
@@ -73,7 +68,8 @@ namespace projetJeu
             : base(x, y)
         {
             this.Initialize();
-            this.Health =  6 ;
+            this.Health =  6f;
+            this.maxHealth = Health;
         }
 
         /// <summary>
@@ -145,21 +141,6 @@ namespace projetJeu
                 obus.Source = this;
                 this.ShootObus(obus);
             }
-        }
-
-        /// <summary>
-        /// Fonction membre à surcharger pour dessiner le sprite. Par défaut la texture est
-        /// affichée, centrée à Position.
-        /// </summary>
-        /// <param name="camera">Caméra indiquant la partie du monde présentement visible à l'écran.</param>
-        /// <param name="spriteBatch">Tampon d'affichage de sprites.</param>
-        public override void Draw(float angle, Camera camera, SpriteBatch spriteBatch, SpriteEffects effects = SpriteEffects.None)
-        {
-            // Le point autour duquel apliquer la rotation est le centre de la texture.
-            Vector2 origine = new Vector2(this.Width / 2, this.Height / 2);
-
-            spriteBatch.Draw(this.Texture, this.Position, null, Color.White, 0f, origine, this.echelle, effects, 0f);
-            //spriteBatch.Draw(this.Texture, destinationRectangle: base.PositionRect, rotation: this.angleRotation);
         }
     }
 }

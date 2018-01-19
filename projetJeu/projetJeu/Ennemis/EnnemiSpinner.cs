@@ -55,24 +55,19 @@ namespace projetJeu
     public class EnnemiSpinner : EnnemiSprite
     {
         /// <summary>
-        /// Attribut statique contenant la texture de l'astéroïde.
-        /// </summary>
-        private static Texture2D texture;
-
-        /// <summary>
         /// Angle de rotation courante du sprite.
         /// </summary>
         private float angleRotation;
 
         /// <summary>
+        /// Attribut statique contenant la texture de l'astéroïde.
+        /// </summary>
+        private static Texture2D texture;
+
+        /// <summary>
         /// Contrôle de vitesse de rotation du sprite.
         /// </summary>
         private float vitesseRotation;
-
-        /// <summary>
-        /// Contrôle d'échelle de dimensionnement du sprite.
-        /// </summary>
-        private float echelle;
 
         /// <summary>
         /// Initialise une nouvelle instance de la classe EnnemiSprite.
@@ -83,7 +78,8 @@ namespace projetJeu
             : base(x, y)
         {
             this.Initialize();
-            this.Health = 2;
+            this.Health = 2f;
+            this.maxHealth = Health;
         }
 
         /// <summary>

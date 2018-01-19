@@ -192,6 +192,8 @@ namespace projetJeu.Managers
             this.probEnnemis = 0.02f;
             this.probEnnemiType = 0.35f;
 
+            EnnemiSprite.Initialize(this.graphics.GraphicsDevice);
+                
             // Créer les attributs de gestion des explosions.
             this.randomExplosions = new Random();
         }
@@ -504,7 +506,10 @@ namespace projetJeu.Managers
 
                 // Afficher les ennemis.
                 foreach (EnnemiSprite ennemi in this.listeEnnemis)
+                {
                     ennemi.Draw(0f, this.camera, this.spriteBatch);
+                    ennemi.DrawHealth(this.spriteBatch);
+                }
 
                 // Afficher les explosions
                 foreach (ParticuleExplosion particule in this.listeParticulesExplosions)
@@ -572,11 +577,11 @@ namespace projetJeu.Managers
 
                 if (random.NextDouble() < probEnnemiType)
                 {
-                    ennemi = new EnnemiShip(0, 0);
+                    ennemi = new EnnemiSpinner(0, 0);
                 }
                 else
                 {
-                    ennemi = new EnnemiSpinner(0, 0);
+                    ennemi = new EnnemiShip(0, 0);
                 }
 
                 if (ennemi == null) return;
