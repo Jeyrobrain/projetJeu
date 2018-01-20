@@ -46,6 +46,7 @@ namespace projetJeu
     using Microsoft.Xna.Framework.Content;
     using Microsoft.Xna.Framework.Graphics;
     using Microsoft.Xna.Framework.Input;
+    using projetJeu.Managers;
 
     /// <summary>
     /// Classe implantant le sprite représentant le vaisseau contrôlé par le joueur. Cette
@@ -58,9 +59,19 @@ namespace projetJeu
         public delegate void Shoot(Obus obus, bool isPlayer = true);
 
         private ProjectileType projectileType = ProjectileType.smallFireShot;
-        private int projectileCount = 1;
-        public bool estFrapper = false;
-        public float projectileAngle = 0.0f;
+        private int projectileCount = 3;
+        public bool IsRespawned = false;
+        private float projectileAngle = 0.0f;
+        private Texture2D previousTexture;
+        public Vector2 PositionInitiale;
+        private float health;
+        public float Health
+        {
+            get { return health; }
+            set { health = value; }
+        }
+
+        private float maxHealth;
 
         /// <summary>
         /// Effet sonore contenant le bruitage des moteurs.
@@ -114,6 +125,8 @@ namespace projetJeu
         /// </summary>
         private SoundEffectInstance moteursActif;
 
+        private static SoundEffect bulletShoot;
+
         /// <summary>
         /// Constructeur paramétré recevant la position du sprite.
         /// </summary>
@@ -128,6 +141,11 @@ namespace projetJeu
             this.moteursActif = moteurs.CreateInstance();
             this.moteursActif.Volume = 0.0f;
             this.moteursActif.IsLooped = true;
+
+            this.Health = 20f;
+            this.maxHealth = this.Health;
+
+            this.PositionInitiale = new Vector2(x, y);
         }
 
         /// <summary>
@@ -202,12 +220,13 @@ namespace projetJeu
 
             // Charger le bruitage des moteurs.
             moteurs = content.Load<SoundEffect>(@"Pipeline\SoundFX\misc291");
+            bulletShoot = content.Load<SoundEffect>(@"Pipeline\SoundFX\bulletshoot");
         }
 
-
-
-        private const float _invulnDelay = 3; // seconds
+        private const float _invulnDelay = 3;
         private float _remainingInvulnDelay = _invulnDelay;
+        private const float _blinkDelay = 0.1f;
+        private float _remainingBlinkDelay = _blinkDelay;
 
         /// <summary>
         /// Fonction membre abstraite mettant à jour le sprite selon les touches de clavier pressées.
@@ -223,14 +242,35 @@ namespace projetJeu
 
             this.projectileAngle = 0f;
 
-            if (estFrapper)
+            float delayTimer = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (IsRespawned)
             {
-                float timer = (float)gameTime.ElapsedGameTime.TotalSeconds;
-                _remainingInvulnDelay -= timer;
+                if (this.Health != this.maxHealth)
+                {
+                    this.Health = this.maxHealth;
+                }
+
+                _remainingBlinkDelay -= delayTimer;
+                if (_remainingBlinkDelay <= 0)
+                {
+                    _remainingBlinkDelay = _blinkDelay;
+                    if (this.vaisseau == GameManager.invisiblePixel)
+                    {
+                        this.vaisseau = previousTexture;
+                    }
+                    else
+                    {
+                        previousTexture = this.vaisseau;
+                        this.vaisseau = GameManager.invisiblePixel;
+                    }
+                }
+
+                _remainingInvulnDelay -= delayTimer;
                 if (_remainingInvulnDelay <= 0)
                 {
                     _remainingInvulnDelay = _invulnDelay;
-                    estFrapper = false; 
+                    IsRespawned = false;
                 }
             }
 
@@ -248,7 +288,14 @@ namespace projetJeu
             }
             else
             {
-                this.vaisseau = vaisseauAvant;
+                if (!IsRespawned)
+                {
+                    this.vaisseau = vaisseauAvant;
+                }
+                else
+                {
+                    this.previousTexture = vaisseauAvant;
+                }
 
                 // Décélération latérale au besoin
                 if (Math.Abs(this.vitesseLaterale) >= FacteurAcceleration)
@@ -268,12 +315,26 @@ namespace projetJeu
             {
                 if (this.vitesseLaterale >= 0.0f)
                 {
-                    this.vaisseau = vaisseauGauche;
+                    if (!IsRespawned)
+                    {
+                        this.vaisseau = vaisseauGauche;
+                    }
+                    else
+                    {
+                        this.previousTexture = vaisseauGauche;
+                    }
                     this.projectileAngle = -MathHelper.ToRadians(35f);
                 }
                 else
                 {
-                    this.vaisseau = vaisseauDroite;
+                    if (!IsRespawned)
+                    {
+                        this.vaisseau = vaisseauDroite;
+                    }
+                    else
+                    {
+                        this.previousTexture = vaisseauDroite;
+                    }
                     this.projectileAngle = MathHelper.ToRadians(35f);
                 }
 
@@ -283,12 +344,26 @@ namespace projetJeu
             {
                 if (this.vitesseLaterale >= 0.0f)
                 {
-                    this.vaisseau = vaisseauDroite;
+                    if (!IsRespawned)
+                    {
+                        this.vaisseau = vaisseauDroite;
+                    }
+                    else
+                    {
+                        this.previousTexture = vaisseauDroite;
+                    }
                     this.projectileAngle = MathHelper.ToRadians(35f);
                 }
                 else
                 {
-                    this.vaisseau = vaisseauGauche;
+                    if (!IsRespawned)
+                    {
+                        this.vaisseau = vaisseauGauche;
+                    }
+                    else
+                    {
+                        this.previousTexture = vaisseauGauche;
+                    }
                     this.projectileAngle = -MathHelper.ToRadians(35f);
                 }
 
@@ -296,7 +371,14 @@ namespace projetJeu
             }
             else
             {
-                this.vaisseau = vaisseauAvant;
+                if (!IsRespawned)
+                {
+                    this.vaisseau = vaisseauAvant;
+                }
+                else
+                {
+                    this.previousTexture = vaisseauAvant;
+                }
                 // Décélération frontale au besoin
                 if (Math.Abs(this.vitesseFrontale) >= FacteurAcceleration)
                 {
@@ -344,7 +426,7 @@ namespace projetJeu
                 this.projectileType = (ProjectileType)(((int)this.projectileType + 1) % ((int)ProjectileType.blueEnergyBall + 1));
             }
 
-            if (ServiceHelper.Get<IInputService>().Shoot(this.IndexPeripherique, this.projectileType))
+            if (!this.IsRespawned && ServiceHelper.Get<IInputService>().Shoot(this.IndexPeripherique, this.projectileType))
             {
 
                 Vector2 pos;
@@ -357,6 +439,8 @@ namespace projetJeu
                 {
                     pos = new Vector2(this.Position.X, this.Position.Y + this.Height / 2);
                 }
+
+                bulletShoot.Play(0.025f, 0f, 0f);
 
                 Obus obus = new Obus(pos, this.projectileType, this.projectileAngle);
                 obus.Source = this;
@@ -411,6 +495,21 @@ namespace projetJeu
                     this.moteursActif.Play();
                 }
             }
+        }
+
+        public void DrawHealth(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(
+                GameManager.redPixel,
+                position: new Vector2(this.Position.X - vaisseauAvant.Width / 2f, this.Position.Y - vaisseauAvant.Height / 2f - vaisseauAvant.Height / 6f),
+                scale: new Vector2(vaisseauAvant.Width, 5f),
+                color: Color.White);
+
+            spriteBatch.Draw(
+                GameManager.greenPixel,
+                position: new Vector2(this.Position.X - vaisseauAvant.Width / 2f, this.Position.Y - vaisseauAvant.Height / 2f - vaisseauAvant.Height / 6f),
+                scale: new Vector2(vaisseauAvant.Width / (this.maxHealth / this.health), 5f),
+                color: Color.White);
         }
     }
 }

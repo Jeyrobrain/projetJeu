@@ -48,7 +48,6 @@ namespace projetJeu
     using Microsoft.Xna.Framework.Input;
     using projetJeu.Managers;
 
-
     /// <summary>
     /// Classe implantant le sprite représentant un astéroïde en rotation.
     /// </summary>
@@ -63,8 +62,6 @@ namespace projetJeu
             get { return shootObus; }
             set { this.shootObus = value; }
         }
-
-        private static Texture2D redPixel, greenPixel;
 
         /// <summary>
         /// Contrôle d'échelle de dimensionnement du sprite.
@@ -99,14 +96,6 @@ namespace projetJeu
 
         }
 
-        public static void Initialize(GraphicsDevice gdm)
-        {
-            redPixel = new Texture2D(gdm, 1, 1);
-            redPixel.SetData<Color>(new[] { Color.Red });
-            greenPixel = new Texture2D(gdm, 1, 1);
-            greenPixel.SetData<Color>(new[] { Color.Green });
-        }
-
         /// <summary>
         /// Vitesse de déplacement verticale du sprite.
         /// </summary>
@@ -130,7 +119,7 @@ namespace projetJeu
 
         public void DrawHealth(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(redPixel, 
+            spriteBatch.Draw(GameManager.redPixel, 
                              new Rectangle((int)this.Position.X - this.Width / 2, 
                                            (int)this.Position.Y - this.Height / 2 - this.Height / 4, 
                                                 this.Width, 
@@ -138,7 +127,7 @@ namespace projetJeu
                              Color.White);
 
             spriteBatch.Draw(
-                greenPixel,
+                GameManager.greenPixel,
                 position: new Vector2(this.Position.X - this.Width / 2 - 1f, this.Position.Y - this.Height / 2 - this.Height / 4),
                 scale: new Vector2((this.Width + 1f) / (this.maxHealth / this.health), 5f),
                 color: Color.White);

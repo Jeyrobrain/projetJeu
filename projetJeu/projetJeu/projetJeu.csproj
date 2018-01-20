@@ -95,6 +95,8 @@
     <Content Include="Content\Pipeline\Menus\Information.xml" />
     <Content Include="Content\Pipeline\Menus\MainMenu.xml" />
     <Content Include="Content\Pipeline\Songs\scifi072.wav" />
+    <Content Include="Content\Pipeline\SoundFX\bulletshoot.wav" />
+    <Content Include="Content\Pipeline\SoundFX\explosion001.wav" />
     <Content Include="Content\Pipeline\SoundFX\menuitem_change.wav" />
     <Content Include="Content\Pipeline\SoundFX\misc291.wav" />
     <Content Include="Content\Projectiles\blue-energy-ball.png">

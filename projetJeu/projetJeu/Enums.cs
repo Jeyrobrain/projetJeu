@@ -1,6 +1,6 @@
 ﻿public enum ProjectileType
 {
-    disque,
+    //disque,
     smallFireShot,
     blueEnergyBall,
 }

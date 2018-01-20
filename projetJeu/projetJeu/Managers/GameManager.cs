@@ -15,6 +15,8 @@ namespace projetJeu.Managers
 {
     public class GameManager
     {
+        public static Texture2D redPixel, greenPixel, invisiblePixel;
+
         private Game game;
 
         private MenuManager menuManager;
@@ -190,9 +192,14 @@ namespace projetJeu.Managers
             this.listeEnnemis = new List<Sprite>();
             this.randomEnnemis = new Random();
             this.probEnnemis = 0.02f;
-            this.probEnnemiType = 0.35f;
+            this.probEnnemiType = 0.4f;
 
-            EnnemiSprite.Initialize(this.graphics.GraphicsDevice);
+            redPixel = new Texture2D(graphics.GraphicsDevice, 1, 1);
+            redPixel.SetData<Color>(new[] { Color.Red });
+            greenPixel = new Texture2D(graphics.GraphicsDevice, 1, 1);
+            greenPixel.SetData<Color>(new[] { Color.Green });
+            invisiblePixel = new Texture2D(graphics.GraphicsDevice, 1, 1);
+            invisiblePixel.SetData<Color>(new[] { Color.Transparent });
                 
             // Créer les attributs de gestion des explosions.
             this.randomExplosions = new Random();
@@ -351,11 +358,17 @@ namespace projetJeu.Managers
                     {
                         bool collision = sprite.Collision(vaisseauJoueur);
 
-                        if (collision)
+                        if (!this.vaisseauJoueur.IsRespawned && collision)
                         {
+                            this.vaisseauJoueur.Health -= 5f;
                             this.listeEnnemisFini.Add(sprite);
-                            this.CreerExplosion(sprite, particulesExplosions, gameTime);
+                            this.CreerExplosion(sprite, particulesExplosions, gameTime, 1f);
                             bruitageExplosion.Play(0.25f, 0f, 0f);
+                            if (vaisseauJoueur.Health < 1)
+                            {
+                                vaisseauJoueur.IsRespawned = true;
+                                this.vaisseauJoueur.Position = this.vaisseauJoueur.PositionInitiale;
+                            }
                         }
                     }
 
@@ -409,6 +422,7 @@ namespace projetJeu.Managers
                 if (cible != null && obus.Source != cible)
                 {
                     cible.Health -= obus.Damage;
+                    this.CreerExplosion(cible, this.particulesExplosions, gameTime, 0.5f);
                     obusFini.Add(obus);
                     if (cible.Health < 1)
                     {
@@ -416,7 +430,7 @@ namespace projetJeu.Managers
                         this.listeEnnemis.Remove(cible);
 
                         // Créer un nouvel effet visuel pour l'explosion.
-                        this.CreerExplosion(cible, this.particulesExplosions, gameTime);
+                        this.CreerExplosion(cible, this.particulesExplosions, gameTime, 1f);
 
                         // Activer l'effet sonore de l'explosion.
                         bruitageExplosion.Play(0.25f, 0f, 0f);
@@ -426,19 +440,23 @@ namespace projetJeu.Managers
 
             foreach (Obus obus in this.listeObusEnnemis)
             {
-                if (!vaisseauJoueur.estFrapper && obus.Collision(this.vaisseauJoueur) && obus.Source != vaisseauJoueur)
+                if (!vaisseauJoueur.IsRespawned && obus.Collision(this.vaisseauJoueur) && obus.Source != vaisseauJoueur)
                 {
-                    vaisseauJoueur.estFrapper = true;
-
+                    vaisseauJoueur.Health -= obus.Damage;
+                    this.CreerExplosion(vaisseauJoueur, this.particulesExplosions, gameTime, 0.5f);
                     // Détruire la cible et l'obus.
                     //this.listeEnnemis.Remove(cible);
                     obusFini.Add(obus);
 
-                    // Créer un nouvel effet visuel pour l'explosion.
-                    this.CreerExplosion(vaisseauJoueur, this.particulesExplosions, gameTime);
-
-                    // Activer l'effet sonore de l'explosion.
-                    bruitageExplosion.Play(0.25f, 0f, 0f);
+                    if (vaisseauJoueur.Health < 1)
+                    {
+                        vaisseauJoueur.IsRespawned = true;
+                        // Créer un nouvel effet visuel pour l'explosion.
+                        this.CreerExplosion(vaisseauJoueur, this.particulesExplosions, gameTime, 1f);
+                        this.vaisseauJoueur.Position = this.vaisseauJoueur.PositionInitiale;
+                        // Activer l'effet sonore de l'explosion.
+                        bruitageExplosion.Play(0.25f, 0f, 0f);
+                    }
                 }
             }
 
@@ -493,6 +511,7 @@ namespace projetJeu.Managers
                 this.arrierePlanEspace.Draw(0f, this.camera, this.spriteBatch);
                 // Afficher le sprite contrôlé par le joueur.
                 this.vaisseauJoueur.Draw(0f, this.camera, this.spriteBatch);
+                this.vaisseauJoueur.DrawHealth(this.spriteBatch);
 
                 foreach (Obus obus in listeObusJoueur)
                 {
@@ -668,7 +687,7 @@ namespace projetJeu.Managers
             fading = true;
         }
 
-        private List<ParticuleExplosion> CreerExplosion(Sprite sprite, Texture2D particuleTexture, GameTime gameTime)
+        private List<ParticuleExplosion> CreerExplosion(Sprite sprite, Texture2D particuleTexture, GameTime gameTime, float grosseur)
         {
             // Liste des nouvelles particules
             List<ParticuleExplosion> nouvellesParticules = new List<ParticuleExplosion>();
@@ -682,7 +701,8 @@ namespace projetJeu.Managers
                 ParticuleExplosion particule = new ParticuleExplosion(
                     sprite.Position,                                 // positionné au départ sur le sprite
                     particuleTexture,                                // texture à utiliser
-                    this.arrierePlanEspace.VitesseArrierePlan);      // vitesse de déplacement vertical
+                    this.arrierePlanEspace.VitesseArrierePlan,       // vitesse de déplacement vertical
+                    grosseur);      
 
                 nouvellesParticules.Add(particule);
                 this.listeParticulesExplosions.Add(particule);

@@ -55,3 +55,9 @@
 /processorParam:Quality=Best
 /build:Pipeline/SoundFX/explosion001.wav
 
+#begin Pipeline\SoundFX\bulletshoot.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Pipeline\SoundFX\bulletshoot.wav
+

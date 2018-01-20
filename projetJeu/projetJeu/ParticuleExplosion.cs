@@ -138,6 +138,8 @@ namespace IFM20884
         /// </summary>
         private int fadeAlpha = 255;
 
+        private float grosseur;
+
         /// <summary>
         /// Facteur de décrémentation de fadeAlpha, appliqué à cette dernière à toutes
         /// les fadeDelai secondes.
@@ -157,7 +159,7 @@ namespace IFM20884
         /// <param name="y">Position en y du sprite.</param>
         /// <param name="texture">Image pour le sprite.</param>
         /// <param name="vitesse">Vitesse de déplacement vertical du sprite.</param>
-        public ParticuleExplosion(float x, float y, Texture2D texture, float vitesse)
+        public ParticuleExplosion(float x, float y, Texture2D texture, float vitesse, float grosseur)
             : base(x, y)
         {
             // Initialiser la texture représentant la particule.
@@ -166,6 +168,8 @@ namespace IFM20884
             // Initialiser la vitesse de déplacement vertical. Cette vitesse devrait correspondre
             // à l'objet à la source de l'explosion (e.g. un astéroïde se déplaçant).
             this.vitesseDeplacement = vitesse;
+
+            this.grosseur = grosseur;
 
             // Paramétriser aléatoirement les attributs de l'instance.
             this.maxEchelle = 0.10f + ((float)randomiseur.NextDouble() * 0.20f);          // échelle maximale entre 0.1 et 0.3
@@ -196,8 +200,8 @@ namespace IFM20884
         /// <param name="position">Position du sprite.</param>
         /// <param name="texture">Image pour le sprite.</param>
         /// <param name="vitesse">Vitesse de déplacement vertical du sprite.</param>
-        public ParticuleExplosion(Vector2 position, Texture2D texture, float vitesse)
-            : this(position.X, position.Y, texture, vitesse)
+        public ParticuleExplosion(Vector2 position, Texture2D texture, float vitesse, float grosseur)
+            : this(position.X, position.Y, texture, vitesse, grosseur)
         {
         }
 
@@ -260,7 +264,7 @@ namespace IFM20884
 
             // Recalculer l'échelle d'affichage de l'image en fonction du facteur d'expansion courant, puis
             // réduire ce facteur de 25%.
-            this.echelle = (float)Math.Min(this.echelle + (gameTime.ElapsedGameTime.Milliseconds * this.expansion), this.maxEchelle);
+            this.echelle = (float)Math.Min(this.echelle + (gameTime.ElapsedGameTime.Milliseconds * this.expansion), this.maxEchelle) * grosseur;
             this.expansion *= 0.75f;
 
             // Calculer le déplacement en X et en Y de la particule en fonction de son angle d'expansion et

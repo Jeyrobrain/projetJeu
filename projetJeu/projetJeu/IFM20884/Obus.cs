@@ -106,10 +106,10 @@ namespace IFM20884
                     this.vitesseBase = new Vector2(3.5f, 3.5f);
                     this.damage = 5;
                     break;
-                case ProjectileType.disque:
-                    this.vitesseBase = new Vector2(3.5f, 3.5f);
-                    this.damage = 10;
-                    break;
+                //case ProjectileType.disque:
+                //    this.vitesseBase = new Vector2(3.5f, 3.5f);
+                //    this.damage = 10;
+                //    break;
             }
 
             this.isEnnemi = isEnnemi;
@@ -162,7 +162,7 @@ namespace IFM20884
         /// les caractéristiques de celui-ci (p.ex. l'écran).</param>
         public static void LoadContent(ContentManager content, GraphicsDeviceManager graphics)
         {
-            palettes.Add(new Palette(content.Load<Texture2D>(@"Projectiles\disque"), 25, 25));
+            //palettes.Add(new Palette(content.Load<Texture2D>(@"Projectiles\disque"), 25, 25));
             palettes.Add(new Palette(content.Load<Texture2D>(@"Projectiles\small-fire-shot"), 17, 17));
             palettes.Add(new Palette(content.Load<Texture2D>(@"Projectiles\blue-energy-ball"), 54, 53));
         }
