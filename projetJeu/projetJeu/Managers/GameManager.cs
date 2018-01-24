@@ -51,7 +51,7 @@ namespace projetJeu.Managers
         private Texture2D particulesExplosions;
 
         // Liste des sprites représentant des astéroïdes.
-        private List<Sprite> listeEnnemis;
+        private List<Sprite> listeEnnemis = new List<Sprite>();
 
         private List<Sprite> listeEnnemisFini = new List<Sprite>();
 
@@ -72,6 +72,17 @@ namespace projetJeu.Managers
         /// Attribut représentant la camera.
         /// </summary>
         private Camera camera;
+
+        /// <summary>
+        /// Attribut représentant la camera.
+        /// </summary>
+        private float point = 0;
+
+        private float pointAutre = 0;
+
+        private SpriteFont policePetit;
+
+        private SpriteFont policeGrand;
 
         /// <summary>
         /// États disponibles du jeu.
@@ -100,6 +111,8 @@ namespace projetJeu.Managers
             /// </summary>
             Pause
         }
+
+        bool gameOver;
 
         /// <summary>
         /// Attribut indiquant l'état du jeu
@@ -176,9 +189,20 @@ namespace projetJeu.Managers
             this.graphics.PreferredBackBufferHeight = 480;
             this.graphics.ApplyChanges();
 
+            this.listeEnnemis.Clear();
+            this.listeEnnemisFini.Clear();
+            this.listeObusEnnemis.Clear();
+            this.listeObusJoueur.Clear();
+            this.listeParticulesExplosions.Clear();
+            this.point = 0f;
+            this.pointAutre = 0f;
+
             // Activer le service de gestion du clavier
-            ServiceHelper.Game = this.game;
-            this.game.Components.Add(new ClavierService(this.game));
+            if (ServiceHelper.Game == null)
+            {
+                ServiceHelper.Game = this.game;
+                this.game.Components.Add(new ClavierService(this.game));
+            }
 
             // Initialiser la vue de la caméra à la taille de l'écran.
             this.camera = new Camera(new Rectangle(0, 0, this.graphics.GraphicsDevice.Viewport.Width, this.graphics.GraphicsDevice.Viewport.Height));
@@ -191,8 +215,10 @@ namespace projetJeu.Managers
             // Créer les attributs de gestion des ennemis.
             this.listeEnnemis = new List<Sprite>();
             this.randomEnnemis = new Random();
-            this.probEnnemis = 0.02f;
+            this.probEnnemis = 0.01f;
             this.probEnnemiType = 0.4f;
+
+            this.gameOver = false;
 
             redPixel = new Texture2D(graphics.GraphicsDevice, 1, 1);
             redPixel.SetData<Color>(new[] { Color.Red });
@@ -219,12 +245,15 @@ namespace projetJeu.Managers
             Obus.LoadContent(this.game.Content, this.graphics);
             EnnemiShip.LoadContent(this.game.Content, this.graphics);
             EnnemiSpinner.LoadContent(this.game.Content, this.graphics);
+            this.policePetit = this.game.Content.Load<SpriteFont>(@"Pipeline/Polices/PoliceItem");
+            this.policeGrand = this.game.Content.Load<SpriteFont>(@"Pipeline/Polices/PoliceTitre");
 
             // Créer les sprites du jeu. Premièrement le sprite du joueur centrer au bas de l'écran. On limite ensuite
             // ses déplacements à l'écran.
             this.vaisseauJoueur = new JoueurSprite(this.graphics.GraphicsDevice.Viewport.Width / 8f, this.graphics.GraphicsDevice.Viewport.Height / 2f);
             this.vaisseauJoueur.BoundsRect = new Rectangle(0, 0, this.graphics.GraphicsDevice.Viewport.Width, this.graphics.GraphicsDevice.Viewport.Height);
             this.vaisseauJoueur.ShootObus += Shoot;
+            this.vaisseauJoueur.NbVies = 3;
 
             // Créer ensuite les sprites représentant les arrière-plans.
             this.arrierePlanEspace = new ArrierePlanEspace(this.graphics);
@@ -245,6 +274,9 @@ namespace projetJeu.Managers
             MediaPlayer.Pause();
         }
 
+        float delaySecond = 1;
+        float delaySecondRestant = 1;
+
         private void Shoot(Obus obus, bool isPlayer)
         {
             if (isPlayer)
@@ -259,6 +291,12 @@ namespace projetJeu.Managers
 
         public void Update(GameTime gameTime)
         {
+            if (vaisseauJoueur.NbVies < 1)
+            {
+                etatJeu = Etats.Pause;
+                gameOver = true;
+            }
+
             if (fading)
             {
                 _faderAlpha += _faderAlphaIncrement;
@@ -326,8 +364,14 @@ namespace projetJeu.Managers
                     // Permettre de quitter le jeu via le service d'input.
                     if (ServiceHelper.Get<IInputService>().Quitter(1))
                     {
-                        this.game.Exit();
-                        Environment.Exit(0);
+                        if (!gameOver) {
+                            this.game.Exit();
+                            Environment.Exit(0);
+                        } else {
+                            this.Initialize();
+                            this.LoadContent();
+                            return;
+                        }
                     }
 
                     // Est-ce que le bouton de pause a été pressé?
@@ -340,6 +384,15 @@ namespace projetJeu.Managers
                     if (Pause)
                     {
                         return;
+                    }
+
+                    float delayTimer = (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    delaySecondRestant -= delayTimer;
+
+                    if(delaySecondRestant <= 0)
+                    {
+                        delaySecondRestant = delaySecond;
+                        pointAutre += 1f;
                     }
 
                     // Mettre à joueur les sprites du jeu
@@ -367,11 +420,11 @@ namespace projetJeu.Managers
                             if (vaisseauJoueur.Health < 1)
                             {
                                 vaisseauJoueur.IsRespawned = true;
+                                vaisseauJoueur.NbVies -= 1;
                                 this.vaisseauJoueur.Position = this.vaisseauJoueur.PositionInitiale;
                             }
                         }
                     }
-
                     foreach (EnnemiSprite s in listeEnnemisFini)
                     {
                         listeEnnemis.Remove(s);
@@ -429,6 +482,10 @@ namespace projetJeu.Managers
                         // Détruire la cible.
                         this.listeEnnemis.Remove(cible);
 
+                        point += 10f;
+                        if (point % 100 == 0)
+                            probEnnemis += 0.005f;
+
                         // Créer un nouvel effet visuel pour l'explosion.
                         this.CreerExplosion(cible, this.particulesExplosions, gameTime, 1f);
 
@@ -451,6 +508,7 @@ namespace projetJeu.Managers
                     if (vaisseauJoueur.Health < 1)
                     {
                         vaisseauJoueur.IsRespawned = true;
+                        this.vaisseauJoueur.NbVies -= 1;
                         // Créer un nouvel effet visuel pour l'explosion.
                         this.CreerExplosion(vaisseauJoueur, this.particulesExplosions, gameTime, 1f);
                         this.vaisseauJoueur.Position = this.vaisseauJoueur.PositionInitiale;
@@ -507,6 +565,7 @@ namespace projetJeu.Managers
 
             else if (EtatJeu == Etats.Jouer || this.EtatJeu == Etats.Pause)
             {
+
                 // Afficher l'arrière-plan.
                 this.arrierePlanEspace.Draw(0f, this.camera, this.spriteBatch);
                 // Afficher le sprite contrôlé par le joueur.
@@ -534,6 +593,29 @@ namespace projetJeu.Managers
                 foreach (ParticuleExplosion particule in this.listeParticulesExplosions)
                 {
                     particule.Draw(0f, this.camera, this.spriteBatch);
+                }
+
+                string points = "Point : " + (point + pointAutre);
+                string vies = "Vies : " + vaisseauJoueur.NbVies;
+
+
+                if (!gameOver)
+                {
+                    spriteBatch.DrawString(policePetit, points, new Vector2(5, 5), Color.DarkCyan);
+                    spriteBatch.DrawString(policePetit, vies, new Vector2(9, 25), Color.DarkCyan);
+                }
+                else
+                {
+
+                    spriteBatch.DrawString(policeGrand, "Game over",
+                        new Vector2(graphics.GraphicsDevice.Viewport.Width / 2 - policeGrand.MeasureString("Game over").X / 2,
+                                    graphics.GraphicsDevice.Viewport.Height / 2 - policeGrand.MeasureString("Game over").Y / 2),
+                    Color.DarkCyan);
+
+                    spriteBatch.DrawString(policeGrand, points,
+                                         new Vector2(graphics.GraphicsDevice.Viewport.Width / 2 - policeGrand.MeasureString(points).X / 2,
+                                          graphics.GraphicsDevice.Viewport.Height / 2 + policeGrand.MeasureString(points).Y / 2),
+                                            Color.DarkCyan);
                 }
             }
 

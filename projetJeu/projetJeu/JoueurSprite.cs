@@ -65,6 +65,14 @@ namespace projetJeu
         private Texture2D previousTexture;
         public Vector2 PositionInitiale;
         private float health;
+        private int nbVies = 1;
+
+        public int NbVies
+        {
+            get { return nbVies; }
+            set { nbVies = value; }
+        }
+
         public float Health
         {
             get { return health; }
