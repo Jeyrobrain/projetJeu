@@ -83,6 +83,9 @@ namespace projetJeu.Managers
         /// </summary>
         private List<Sprite> listeEnnemisFini;
 
+        /// <summary>
+        /// Liste des power-ups
+        /// </summary>
         private List<PowerUp> listePowerUp;
 
         /// <summary>
@@ -112,7 +115,7 @@ namespace projetJeu.Managers
         /// <summary>
         /// Probabilité de généré un powerup
         /// </summary>
-        private float probPowerup;
+        private float probPowerUp;
 
         /// <summary>
         /// Attribut gérant l'affichage en batch à l'écran.
@@ -175,7 +178,7 @@ namespace projetJeu.Managers
         /// <summary>
         /// Est ce que le joueur à eu un game-over?
         /// </summary>
-        bool gameOver;
+        bool jeuFini;
 
         /// <summary>
         /// Attribut indiquant l'état du jeu
@@ -183,11 +186,14 @@ namespace projetJeu.Managers
         private Etats etatJeu;
 
         /// <summary>
-        /// Etat dans lequel état le jeu avant que la dernière pause ne soit activée.
+        /// État de jeu précédent
         /// </summary>
-        private Etats prevEtatJeu;
+        private Etats etatJeuPrecedent;
 
-        private Etats nextEtatJeu;
+        /// <summary>
+        /// État de jeu prochain
+        /// </summary>
+        private Etats etatJeuProchain;
 
         /// <summary>
         /// Propriété (accesseur pour etatJeu) retournant ou changeant l'état du jeu.
@@ -209,39 +215,76 @@ namespace projetJeu.Managers
         /// </summary>
         private Song bruitageFond;
 
-        private SoundEffect pickupSound;
+        /// <summary>
+        /// Bruit quand on ramasse un power-up
+        /// </summary>
+        private SoundEffect bruitageRamasser;
 
         /// <summary>
         /// Attribut représentant l'arrière plan d'étoiles à défilement vertical du du jeu.
         /// </summary>
         private DefilementArrierePlan arrierePlanEspace;
 
+        /// <summary>
+        /// Texture qu'on veut utiliser come fader
+        /// </summary>
         private Texture2D _faderTexture;
+        /// <summary>
+        /// Opacité du fader
+        /// </summary>
         private float _faderAlpha;
+        /// <summary>
+        /// Incrémentation de l'opacité du fader
+        /// </summary>
         private float _faderAlphaIncrement;
+        /// <summary>
+        /// Si ont est en train de fade à une autre scène
+        /// </summary>
         private bool fading;
+        /// <summary>
+        /// Si ont a changer de scènes
+        /// </summary>
         private bool switchScenes;
 
+        /// <summary>
+        /// Delay pour une seconde (1)
+        /// </summary>
         float delaySecond;
+        /// <summary>
+        /// Delay restant pour qu'une seconde soit passer
+        /// </summary>
         float delaySecondRestant;
 
+        /// <summary>
+        /// Constructeur de notre manager
+        /// </summary>
+        /// <param name="_game">Variable du jeu</param>
         public GameManager(Game _game)
         {
             this.game = _game;
             this.graphics = new GraphicsDeviceManager(game);
-            this.game.Content.RootDirectory = "Content";
+            this.GetContent().RootDirectory = "Content";
         }
 
+        /// <summary>
+        /// Retourne le contentmanager du jeu
+        /// </summary>
         public ContentManager GetContent()
         {
             return game.Content;
         }
 
+        /// <summary>
+        /// On ferme le jeu
+        /// </summary>
         public void Exit()
         {
             this.game.Exit();
         }
 
+        /// <summary>
+        /// On initialize les variables
+        /// </summary>
         public void Initialize()
         {
             _faderTexture = new Texture2D(graphics.GraphicsDevice, 1, 1);
@@ -295,9 +338,9 @@ namespace projetJeu.Managers
             this.randomPowerup = new Random();
             this.probEnnemis = 0.005f;
             this.probEnnemiType = 0.4f;
-            this.probPowerup = 0.35f;
+            this.probPowerUp = 0.35f;
 
-            this.gameOver = false;
+            this.jeuFini = false;
 
             redPixel = new Texture2D(graphics.GraphicsDevice, 1, 1);
             redPixel.SetData<Color>(new[] { Color.Red });
@@ -310,6 +353,9 @@ namespace projetJeu.Managers
             this.randomExplosions = new Random();
         }
 
+        /// <summary>
+        /// On charge nos variables
+        /// </summary>
         public void LoadContent()
         {
             this.menuManager.LoadContent();
@@ -319,19 +365,19 @@ namespace projetJeu.Managers
             this.spriteBatch = new SpriteBatch(this.graphics.GraphicsDevice);
 
             // Charger les sprites.
-            JoueurSprite.LoadContent(this.game.Content, this.graphics);
-            ArrierePlanEspace.LoadContent(this.game.Content, this.graphics);
-            Obus.LoadContent(this.game.Content, this.graphics);
-            EnnemiShip.LoadContent(this.game.Content, this.graphics);
-            EnnemiSpinner.LoadContent(this.game.Content, this.graphics);
-            PowerUp_Fire_Shot.LoadContent(this.game.Content, this.graphics);
-            PowerUp_Energy_Ball.LoadContent(this.game.Content, this.graphics);
-            PowerUp_One_Projectile.LoadContent(this.game.Content, this.graphics);
-            PowerUp_Three_Projectile.LoadContent(this.game.Content, this.graphics);
-            PowerUp_Two_Projectile.LoadContent(this.game.Content, this.graphics);
+            JoueurSprite.LoadContent(this.GetContent(), this.graphics);
+            ArrierePlanEspace.LoadContent(this.GetContent(), this.graphics);
+            Obus.LoadContent(this.GetContent(), this.graphics);
+            EnnemiShip.LoadContent(this.GetContent(), this.graphics);
+            EnnemiSpinner.LoadContent(this.GetContent(), this.graphics);
+            PowerUp_Fire_Shot.LoadContent(this.GetContent(), this.graphics);
+            PowerUp_Energy_Ball.LoadContent(this.GetContent(), this.graphics);
+            PowerUp_One_Projectile.LoadContent(this.GetContent(), this.graphics);
+            PowerUp_Three_Projectile.LoadContent(this.GetContent(), this.graphics);
+            PowerUp_Two_Projectile.LoadContent(this.GetContent(), this.graphics);
 
-            this.policePetit = this.game.Content.Load<SpriteFont>(@"Pipeline/Polices/PoliceItem");
-            this.policeGrand = this.game.Content.Load<SpriteFont>(@"Pipeline/Polices/PoliceTitre");
+            this.policePetit = this.GetContent().Load<SpriteFont>(@"Pipeline/Polices/PoliceItem");
+            this.policeGrand = this.GetContent().Load<SpriteFont>(@"Pipeline/Polices/PoliceTitre");
 
             // Créer les sprites du jeu. Premièrement le sprite du joueur centrer au bas de l'écran. On limite ensuite
             // ses déplacements à l'écran.
@@ -340,19 +386,19 @@ namespace projetJeu.Managers
             this.vaisseauJoueur.ShootObus += Shoot;
             this.vaisseauJoueur.NbVies = 3;
 
-            this.pickupSound = this.game.Content.Load<SoundEffect>(@"Pipeline\SoundFX\pickup");
+            this.bruitageRamasser = this.GetContent().Load<SoundEffect>(@"Pipeline\SoundFX\pickup");
 
             // Créer ensuite les sprites représentant les arrière-plans.
             this.arrierePlanEspace = new ArrierePlanEspace(this.graphics);
 
             // Charger le bruitage de fond du jeu.
-            this.bruitageFond = this.game.Content.Load<Song>(@"Pipeline\Songs\scifi072");
+            this.bruitageFond = this.GetContent().Load<Song>(@"Pipeline\Songs\scifi072");
 
-            this.mainmenuImage = this.game.Content.Load<Texture2D>(@"ArrieresPlans\mainmenu.jpg");
+            this.mainmenuImage = this.GetContent().Load<Texture2D>(@"ArrieresPlans\mainmenu.jpg");
 
             // Charger les textures associées aux effets visuels gérées par Game.
-            this.particulesExplosions = this.game.Content.Load<Texture2D>(@"Explosion\explosionAsteroides");
-            bruitageExplosion = this.game.Content.Load<SoundEffect>(@"Pipeline\SoundFX\explosion001");
+            this.particulesExplosions = this.GetContent().Load<Texture2D>(@"Explosion\explosionAsteroides");
+            bruitageExplosion = this.GetContent().Load<SoundEffect>(@"Pipeline\SoundFX\explosion001");
 
             // Paramétrer la musique de fond et la démarrer.
             MediaPlayer.Volume = 0.05f;         // pour mieux entendre les autres effets sonores
@@ -361,6 +407,11 @@ namespace projetJeu.Managers
             MediaPlayer.Pause();
         }
 
+        /// <summary>
+        /// Déléguée pour tirer (les vaisseaux)
+        /// </summary>
+        /// <param name="obus">Obus en question</param>
+        /// <param name="isPlayer">Est-ce-que l'obus vient du joueur</param>
         private void Shoot(Obus obus, bool isPlayer)
         {
             if (isPlayer)
@@ -373,6 +424,9 @@ namespace projetJeu.Managers
             }
         }
 
+        /// <summary>
+        /// Nettoye les listes
+        /// </summary>
         private void ClearLists()
         {
             this.listeEnnemis.Clear();
@@ -385,6 +439,10 @@ namespace projetJeu.Managers
             this.listePowerUpFini.Clear();
         }
 
+        /// <summary>
+        /// Boucle de jeu
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public void Update(GameTime gameTime)
         {
             if (vaisseauJoueur != null && vaisseauJoueur.NbVies < 1)
@@ -393,7 +451,7 @@ namespace projetJeu.Managers
                 this.SuspendreEffetsSonores(true);
                 this.ClearLists();
                 this.vaisseauJoueur = null;
-                gameOver = true;
+                jeuFini = true;
             }
 
             if (fading)
@@ -422,7 +480,7 @@ namespace projetJeu.Managers
                 {
                     if (switchScenes)
                     {
-                        this.EtatJeu = nextEtatJeu;
+                        this.EtatJeu = etatJeuProchain;
                         if (EtatJeu == Etats.Info)
                         {
                             menuManager.MenuCourant = menuManager.TrouverMenu("Information");
@@ -442,10 +500,10 @@ namespace projetJeu.Managers
                 }
                 else
                 {
-                    if (switchScenes && this.nextEtatJeu == Etats.Demarrer)
+                    if (switchScenes && this.etatJeuProchain == Etats.Demarrer)
                     {
                         switchScenes = false;
-                        this.EtatJeu = nextEtatJeu;
+                        this.EtatJeu = etatJeuProchain;
                         menuManager.MenuCourant = menuManager.TrouverMenu("MainMenu");
                     }
                 }
@@ -463,17 +521,9 @@ namespace projetJeu.Managers
                     // Permettre de quitter le jeu via le service d'input.
                     if (ServiceHelper.Get<IInputService>().Quitter(1))
                     {
-                        if (!gameOver)
-                        {
-                            this.game.Exit();
-                            Environment.Exit(0);
-                        }
-                        else
-                        {
-                            this.Initialize();
-                            this.LoadContent();
-                            return;
-                        }
+                        this.Initialize();
+                        this.LoadContent();
+                        return;
                     }
 
                     // Est-ce que le bouton de pause a été pressé?
@@ -550,7 +600,7 @@ namespace projetJeu.Managers
             // Identifier les obus ayant quitté l'écran.
             foreach (Obus obus in this.listeObusJoueur)
             {
-                if (obus.Position.X + obus.Width > this.graphics.GraphicsDevice.Viewport.Width ||
+                if (obus.Position.X + obus.Width > this.graphics.GraphicsDevice.Viewport.Width + obus.Width ||
                     obus.Position.X < 0 ||
                     obus.Position.Y < 0 ||
                     obus.Position.Y - obus.Height > this.graphics.GraphicsDevice.Viewport.Height)
@@ -561,7 +611,7 @@ namespace projetJeu.Managers
 
             foreach (Obus obus in this.listeObusEnnemis)
             {
-                if (obus.Position.X + obus.Width > this.graphics.GraphicsDevice.Viewport.Width ||
+                if (obus.Position.X + obus.Width > this.graphics.GraphicsDevice.Viewport.Width - obus.Width ||
                     obus.Position.X < 0 ||
                     obus.Position.Y < 0 ||
                     obus.Position.Y - obus.Height > this.graphics.GraphicsDevice.Viewport.Height)
@@ -596,7 +646,7 @@ namespace projetJeu.Managers
                         // Activer l'effet sonore de l'explosion.
                         bruitageExplosion.Play(0.25f, 0f, 0f);
 
-                        if (randomPowerup.NextDouble() <= probPowerup)
+                        if (randomPowerup.NextDouble() <= probPowerUp)
                         {
                             PowerUp powerup;
                             if (randomPowerup.NextDouble() > 0.5f)
@@ -607,7 +657,7 @@ namespace projetJeu.Managers
                                 }
                                 else if (probEnnemis / 0.005f == 2)
                                 {
-                                    if (randomPowerup.NextDouble() > 0.5f) 
+                                    if (randomPowerup.NextDouble() > 0.75f) 
                                     {
                                         powerup = new PowerUp_One_Projectile(cible.Position);
                                     }
@@ -620,17 +670,17 @@ namespace projetJeu.Managers
                                 {
                                     if (randomPowerup.NextDouble() > 0.5f)
                                     {
-                                        powerup = new PowerUp_One_Projectile(cible.Position);
+                                        powerup = new PowerUp_Three_Projectile(cible.Position);
                                     }
                                     else
                                     {
                                         if (randomPowerup.NextDouble() > 0.5f)
                                         {
-                                            powerup = new PowerUp_Two_Projectile(cible.Position);
+                                            powerup = new PowerUp_One_Projectile(cible.Position);
                                         }
                                         else
                                         {
-                                            powerup = new PowerUp_Three_Projectile(cible.Position);
+                                            powerup = new PowerUp_Two_Projectile(cible.Position);
                                         }
                                     }
                                 }
@@ -700,6 +750,10 @@ namespace projetJeu.Managers
             }
         }
 
+        /// <summary>
+        /// Mise à jour des power-ups
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected void UpdatePowerUps(GameTime gameTime)
         {
             foreach (PowerUp p in listePowerUp)
@@ -717,7 +771,7 @@ namespace projetJeu.Managers
             {
                 if (p.Collision(vaisseauJoueur))
                 {
-                    pickupSound.Play(0.5f, 0f, 0f);
+                    bruitageRamasser.Play(0.5f, 0f, 0f);
                     listePowerUpFini.Add(p);
                     ActivatePowerUp(p);
                 }
@@ -734,6 +788,10 @@ namespace projetJeu.Managers
             }
         }
 
+        /// <summary>
+        /// On active l'effet du power-up
+        /// </summary>
+        /// <param name="p">Power-up en question</param>
         private void ActivatePowerUp(PowerUp p)
         {
             if (p is PowerUp_Energy_Ball)
@@ -756,6 +814,7 @@ namespace projetJeu.Managers
             {
                 vaisseauJoueur.ProjectileCount = 3;
             }
+            this.pointsAutre += 10;
         }
 
         /// <summary>
@@ -776,6 +835,14 @@ namespace projetJeu.Managers
                                            "Numpad pour changer # de projectiles\n  + pour changer le type de projectile", 
                                            new Vector2(graphics.GraphicsDevice.Viewport.Width / 2 - 173f, 
                                                        graphics.GraphicsDevice.Viewport.Height / 2 - 50f), 
+                                           Color.White);
+                }
+                else
+                {
+                    string str = "Par Justyn, Marwan, et Jeremi.";
+                    spriteBatch.DrawString(policePetit,
+                                           str,
+                                           new Vector2(graphics.GraphicsDevice.Viewport.Width - policePetit.MeasureString(str).X, 0),
                                            Color.White);
                 }
                 this.menuManager.Draw(spriteBatch);
@@ -822,15 +889,15 @@ namespace projetJeu.Managers
                     particule.Draw(0f, this.camera, this.spriteBatch);
                 }
 
-                string points = (!this.gameOver ? "Points    : " : "Points: ") + (this.points + pointsAutre);
+                string points = (!this.jeuFini ? "Points       : " : "Points: ") + (this.points + pointsAutre);
                 string vies = "";
                 if (this.vaisseauJoueur != null)
                 {
-                    vies = "Vies       : " + vaisseauJoueur.NbVies;
+                    vies = "Vies          : " + vaisseauJoueur.NbVies;
                 }
                 string difficulté = "Difficultée : " + ((int)(this.probEnnemis / 0.005f)) + "x";
 
-                if (!gameOver)
+                if (!jeuFini)
                 {
                     spriteBatch.DrawString(policePetit, points, new Vector2(5, 5), Color.DarkCyan);
                     spriteBatch.DrawString(policePetit, vies, new Vector2(5, 25), Color.DarkCyan);
@@ -847,6 +914,11 @@ namespace projetJeu.Managers
                     spriteBatch.DrawString(policeGrand, points,
                                          new Vector2(graphics.GraphicsDevice.Viewport.Width / 2 - policeGrand.MeasureString(points).X / 2,
                                           graphics.GraphicsDevice.Viewport.Height / 2 + policeGrand.MeasureString(points).Y / 2),
+                                            Color.DarkCyan);
+
+                    spriteBatch.DrawString(policeGrand, "Appuyez sur ESC",
+                                         new Vector2(graphics.GraphicsDevice.Viewport.Width / 2 - policeGrand.MeasureString("Appuyez sur ESC").X / 2,
+                                          graphics.GraphicsDevice.Viewport.Height / 2 + policeGrand.MeasureString("Appuyez sur ESC").Y * 2),
                                             Color.DarkCyan);
                 }
             }
@@ -942,6 +1014,10 @@ namespace projetJeu.Managers
             }
         }
 
+        /// <summary>
+        /// On vérifie si on peut pondre l'ennemi
+        /// </summary>
+        /// <param name="ennemi">Ennemi en question</param>
         private bool EnnemiSpawnError(EnnemiSprite ennemi) {
             bool error = false;
             foreach(EnnemiSprite e in listeEnnemis) {
@@ -972,13 +1048,13 @@ namespace projetJeu.Managers
                 if (value && this.EtatJeu != Etats.Pause)
                 {
                     // Stocker l'état courant du jeu avant d'activer la pause
-                    this.prevEtatJeu = this.EtatJeu;
+                    this.etatJeuPrecedent = this.EtatJeu;
                     this.EtatJeu = Etats.Pause;
                 }
                 else if (!value && this.EtatJeu == Etats.Pause)
                 {
                     // Restaurer l'état du jeu à ce qu'il était avant la pause
-                    this.EtatJeu = this.prevEtatJeu;
+                    this.EtatJeu = this.etatJeuPrecedent;
                 }
 
                 // Suspendre les effets sonores au besoin
@@ -1017,7 +1093,7 @@ namespace projetJeu.Managers
         /// <param name="etat">Prochain etat</param>
         public void FadeOut(Etats etat)
         {
-            nextEtatJeu = etat;
+            etatJeuProchain = etat;
             _faderAlpha = 0f;
             _faderAlphaIncrement = 10;
             fading = true;
