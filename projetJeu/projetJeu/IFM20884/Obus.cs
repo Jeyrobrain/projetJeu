@@ -63,8 +63,8 @@ namespace IFM20884
             set { this.angle = value; }
         }
 
-        private int damage;
-        public int Damage
+        private float damage;
+        public float Damage
         {
             get { return damage; } 
             set {damage = value; }
@@ -100,11 +100,11 @@ namespace IFM20884
             {
                 case ProjectileType.smallFireShot:
                     this.vitesseBase = new Vector2(2.5f, 2.5f);
-                    this.damage = 1;
+                    this.damage = 1f;
                     break;
                 case ProjectileType.blueEnergyBall:
                     this.vitesseBase = new Vector2(3.5f, 3.5f);
-                    this.damage = 5;
+                    this.damage = 5f;
                     break;
                 //case ProjectileType.disque:
                 //    this.vitesseBase = new Vector2(3.5f, 3.5f);

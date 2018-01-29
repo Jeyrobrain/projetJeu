@@ -291,17 +291,13 @@ namespace projetJeu
             return this.etatClavier.IsKeyDown(Keys.Enter);
         }
 
-
-
-
-
         public bool Shoot(int device, ProjectileType projectileType)
         {
             int delay = 200;
             switch (projectileType)
             {
                 case ProjectileType.blueEnergyBall:
-                    delay = 350;
+                    delay = 500;
                     break;
                 case ProjectileType.smallFireShot:
                     delay = 75;

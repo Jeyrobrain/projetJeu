@@ -15,20 +15,43 @@ namespace projetJeu.Managers
 {
     public class GameManager
     {
+        /// <summary>
+        /// Pixels de couleur pour utiliser come texture
+        /// </summary>
         public static Texture2D redPixel, greenPixel, invisiblePixel;
 
+        /// <summary>
+        /// Instance du jeu
+        /// </summary>
         private Game game;
 
+        /// <summary>
+        /// Nos menus
+        /// </summary>
         private MenuManager menuManager;
 
+        /// <summary>
+        /// Écran graphique
+        /// </summary>
         private GraphicsDeviceManager graphics;
 
+        /// <summary>
+        /// Image de l'écran pricipale
+        /// </summary>
         private Texture2D mainmenuImage;
 
-        private List<Obus> listeObusJoueur = new List<Obus>();
-        private List<Obus> listeObusEnnemis = new List<Obus>();
-
-        private List<Obus> obusFini = new List<Obus>();
+        /// <summary>
+        /// Liste d'obus du joueur
+        /// </summary>
+        private List<Obus> listeObusJoueur;
+        /// <summary>
+        /// Liste d'obus des ennemis
+        /// </summary>
+        private List<Obus> listeObusEnnemis;
+        /// <summary>
+        /// Liste d'obus à éffacer
+        /// </summary>
+        private List<Obus> listeObusFini;
 
         /// <summary>
         /// Effet sonore d'explosion d'astéroïde et de vaisseau.
@@ -43,25 +66,53 @@ namespace projetJeu.Managers
         /// <summary>
         /// Liste de gestion des particules d'explosions.
         /// </summary>
-        private List<ParticuleExplosion> listeParticulesExplosions = new List<ParticuleExplosion>();
+        private List<ParticuleExplosion> listeParticulesExplosions;
 
         /// <summary>
         /// Texture représentant une particule d'explosion d'astéroïdes.
         /// </summary>
         private Texture2D particulesExplosions;
 
-        // Liste des sprites représentant des astéroïdes.
-        private List<Sprite> listeEnnemis = new List<Sprite>();
+        /// <summary>
+        /// Liste des ennemis
+        /// </summary>
+        private List<Sprite> listeEnnemis;
 
-        private List<Sprite> listeEnnemisFini = new List<Sprite>();
+        /// <summary>
+        /// Liste des ennemis
+        /// </summary>
+        private List<Sprite> listeEnnemisFini;
 
-        // Générateur de nombres aléatoires pour générer des astéroïdes.
+        private List<PowerUp> listePowerUp;
+
+        /// <summary>
+        /// Liste des powerups à éffacer
+        /// </summary>
+        private List<PowerUp> listePowerUpFini;
+
+        /// <summary>
+        /// Générateur aléatoire pour les ennemis
+        /// </summary>
         private Random randomEnnemis;
+        /// <summary>
+        /// Générateur aléatoire pour les powerups
+        /// </summary>
+        private Random randomPowerup;
 
-        // Probabilité de générer un astéroïde par cycle de Update().
+        /// <summary>
+        /// Probabilité de généré un ennemi
+        /// </summary>
         private float probEnnemis;
 
+        /// <summary>
+        /// Probabilité de généré un ennemi de type spinner
+        /// </summary>
         private float probEnnemiType;
+
+        /// <summary>
+        /// Probabilité de généré un powerup
+        /// </summary>
+        private float probPowerup;
 
         /// <summary>
         /// Attribut gérant l'affichage en batch à l'écran.
@@ -74,14 +125,23 @@ namespace projetJeu.Managers
         private Camera camera;
 
         /// <summary>
-        /// Attribut représentant la camera.
+        /// Les points qui affectent la difficulté du jeu
         /// </summary>
-        private float point = 0;
+        private float points;
 
-        private float pointAutre = 0;
+        /// <summary>
+        /// Les points qui n'affectent pas la difficulté du jeu
+        /// </summary>
+        private float pointsAutre;
 
+        /// <summary>
+        /// Police de taille petit
+        /// </summary>
         private SpriteFont policePetit;
 
+        /// <summary>
+        /// Police de taille grand
+        /// </summary>
         private SpriteFont policeGrand;
 
         /// <summary>
@@ -112,6 +172,9 @@ namespace projetJeu.Managers
             Pause
         }
 
+        /// <summary>
+        /// Est ce que le joueur à eu un game-over?
+        /// </summary>
         bool gameOver;
 
         /// <summary>
@@ -146,6 +209,8 @@ namespace projetJeu.Managers
         /// </summary>
         private Song bruitageFond;
 
+        private SoundEffect pickupSound;
+
         /// <summary>
         /// Attribut représentant l'arrière plan d'étoiles à défilement vertical du du jeu.
         /// </summary>
@@ -153,9 +218,12 @@ namespace projetJeu.Managers
 
         private Texture2D _faderTexture;
         private float _faderAlpha;
-        private float _faderAlphaIncrement = 10;
+        private float _faderAlphaIncrement;
         private bool fading;
         private bool switchScenes;
+
+        float delaySecond;
+        float delaySecondRestant;
 
         public GameManager(Game _game)
         {
@@ -189,13 +257,23 @@ namespace projetJeu.Managers
             this.graphics.PreferredBackBufferHeight = 480;
             this.graphics.ApplyChanges();
 
-            this.listeEnnemis.Clear();
-            this.listeEnnemisFini.Clear();
-            this.listeObusEnnemis.Clear();
-            this.listeObusJoueur.Clear();
-            this.listeParticulesExplosions.Clear();
-            this.point = 0f;
-            this.pointAutre = 0f;
+            this._faderAlphaIncrement = 10f;
+            this.delaySecond = 1f;
+            this.delaySecondRestant = 1f;
+
+            this.listeEnnemis = new List<Sprite>();
+            this.listeEnnemisFini = new List<Sprite>();
+            this.listeObusEnnemis = new List<Obus>();
+            this.listeObusJoueur = new List<Obus>();
+            this.listeParticulesExplosions = new List<ParticuleExplosion>();
+            this.listeObusFini = new List<Obus>();
+            this.listePowerUp = new List<PowerUp>();
+            this.listePowerUpFini = new List<PowerUp>();
+
+            ClearLists();
+
+            this.points = 0f;
+            this.pointsAutre = 0f;
 
             // Activer le service de gestion du clavier
             if (ServiceHelper.Game == null)
@@ -213,10 +291,11 @@ namespace projetJeu.Managers
             this.etatJeu = Etats.Demarrer;
 
             // Créer les attributs de gestion des ennemis.
-            this.listeEnnemis = new List<Sprite>();
             this.randomEnnemis = new Random();
-            this.probEnnemis = 0.01f;
+            this.randomPowerup = new Random();
+            this.probEnnemis = 0.005f;
             this.probEnnemiType = 0.4f;
+            this.probPowerup = 0.35f;
 
             this.gameOver = false;
 
@@ -245,6 +324,12 @@ namespace projetJeu.Managers
             Obus.LoadContent(this.game.Content, this.graphics);
             EnnemiShip.LoadContent(this.game.Content, this.graphics);
             EnnemiSpinner.LoadContent(this.game.Content, this.graphics);
+            PowerUp_Fire_Shot.LoadContent(this.game.Content, this.graphics);
+            PowerUp_Energy_Ball.LoadContent(this.game.Content, this.graphics);
+            PowerUp_One_Projectile.LoadContent(this.game.Content, this.graphics);
+            PowerUp_Three_Projectile.LoadContent(this.game.Content, this.graphics);
+            PowerUp_Two_Projectile.LoadContent(this.game.Content, this.graphics);
+
             this.policePetit = this.game.Content.Load<SpriteFont>(@"Pipeline/Polices/PoliceItem");
             this.policeGrand = this.game.Content.Load<SpriteFont>(@"Pipeline/Polices/PoliceTitre");
 
@@ -254,6 +339,8 @@ namespace projetJeu.Managers
             this.vaisseauJoueur.BoundsRect = new Rectangle(0, 0, this.graphics.GraphicsDevice.Viewport.Width, this.graphics.GraphicsDevice.Viewport.Height);
             this.vaisseauJoueur.ShootObus += Shoot;
             this.vaisseauJoueur.NbVies = 3;
+
+            this.pickupSound = this.game.Content.Load<SoundEffect>(@"Pipeline\SoundFX\pickup");
 
             // Créer ensuite les sprites représentant les arrière-plans.
             this.arrierePlanEspace = new ArrierePlanEspace(this.graphics);
@@ -274,9 +361,6 @@ namespace projetJeu.Managers
             MediaPlayer.Pause();
         }
 
-        float delaySecond = 1;
-        float delaySecondRestant = 1;
-
         private void Shoot(Obus obus, bool isPlayer)
         {
             if (isPlayer)
@@ -289,11 +373,26 @@ namespace projetJeu.Managers
             }
         }
 
+        private void ClearLists()
+        {
+            this.listeEnnemis.Clear();
+            this.listeEnnemisFini.Clear();
+            this.listeObusEnnemis.Clear();
+            this.listeObusJoueur.Clear();
+            this.listeParticulesExplosions.Clear();
+            this.listeObusFini.Clear();
+            this.listePowerUp.Clear();
+            this.listePowerUpFini.Clear();
+        }
+
         public void Update(GameTime gameTime)
         {
-            if (vaisseauJoueur.NbVies < 1)
+            if (vaisseauJoueur != null && vaisseauJoueur.NbVies < 1)
             {
                 etatJeu = Etats.Pause;
+                this.SuspendreEffetsSonores(true);
+                this.ClearLists();
+                this.vaisseauJoueur = null;
                 gameOver = true;
             }
 
@@ -364,10 +463,13 @@ namespace projetJeu.Managers
                     // Permettre de quitter le jeu via le service d'input.
                     if (ServiceHelper.Get<IInputService>().Quitter(1))
                     {
-                        if (!gameOver) {
+                        if (!gameOver)
+                        {
                             this.game.Exit();
                             Environment.Exit(0);
-                        } else {
+                        }
+                        else
+                        {
                             this.Initialize();
                             this.LoadContent();
                             return;
@@ -389,12 +491,11 @@ namespace projetJeu.Managers
                     float delayTimer = (float)gameTime.ElapsedGameTime.TotalSeconds;
                     delaySecondRestant -= delayTimer;
 
-                    if(delaySecondRestant <= 0)
+                    if (delaySecondRestant <= 0)
                     {
                         delaySecondRestant = delaySecond;
-                        pointAutre += 1f;
+                        pointsAutre += 1f;
                     }
-
                     // Mettre à joueur les sprites du jeu
                     this.vaisseauJoueur.Update(gameTime, this.graphics);
                     this.arrierePlanEspace.Update(gameTime, this.graphics);
@@ -425,10 +526,13 @@ namespace projetJeu.Managers
                             }
                         }
                     }
+
                     foreach (EnnemiSprite s in listeEnnemisFini)
                     {
                         listeEnnemis.Remove(s);
                     }
+
+                    UpdatePowerUps(gameTime);
                 }
             }
         }
@@ -451,7 +555,7 @@ namespace projetJeu.Managers
                     obus.Position.Y < 0 ||
                     obus.Position.Y - obus.Height > this.graphics.GraphicsDevice.Viewport.Height)
                 {
-                    obusFini.Add(obus);
+                    listeObusFini.Add(obus);
                 }
             }
 
@@ -462,7 +566,7 @@ namespace projetJeu.Managers
                     obus.Position.Y < 0 ||
                     obus.Position.Y - obus.Height > this.graphics.GraphicsDevice.Viewport.Height)
                 {
-                    obusFini.Add(obus);
+                    listeObusFini.Add(obus);
                 }
             }
 
@@ -476,14 +580,14 @@ namespace projetJeu.Managers
                 {
                     cible.Health -= obus.Damage;
                     this.CreerExplosion(cible, this.particulesExplosions, gameTime, 0.5f);
-                    obusFini.Add(obus);
+                    listeObusFini.Add(obus);
                     if (cible.Health < 1)
                     {
                         // Détruire la cible.
                         this.listeEnnemis.Remove(cible);
 
-                        point += 10f;
-                        if (point % 100 == 0)
+                        points += 10f;
+                        if (points % 100 == 0)
                             probEnnemis += 0.005f;
 
                         // Créer un nouvel effet visuel pour l'explosion.
@@ -491,6 +595,59 @@ namespace projetJeu.Managers
 
                         // Activer l'effet sonore de l'explosion.
                         bruitageExplosion.Play(0.25f, 0f, 0f);
+
+                        if (randomPowerup.NextDouble() <= probPowerup)
+                        {
+                            PowerUp powerup;
+                            if (randomPowerup.NextDouble() > 0.5f)
+                            {
+                                if (probEnnemis / 0.005f == 1)
+                                {
+                                    powerup = new PowerUp_One_Projectile(cible.Position);
+                                }
+                                else if (probEnnemis / 0.005f == 2)
+                                {
+                                    if (randomPowerup.NextDouble() > 0.5f) 
+                                    {
+                                        powerup = new PowerUp_One_Projectile(cible.Position);
+                                    }
+                                    else
+                                    {
+                                        powerup = new PowerUp_Two_Projectile(cible.Position);
+                                    }
+                                }
+                                else
+                                {
+                                    if (randomPowerup.NextDouble() > 0.5f)
+                                    {
+                                        powerup = new PowerUp_One_Projectile(cible.Position);
+                                    }
+                                    else
+                                    {
+                                        if (randomPowerup.NextDouble() > 0.5f)
+                                        {
+                                            powerup = new PowerUp_Two_Projectile(cible.Position);
+                                        }
+                                        else
+                                        {
+                                            powerup = new PowerUp_Three_Projectile(cible.Position);
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (randomPowerup.NextDouble() > 0.5f)
+                                {
+                                    powerup = new PowerUp_Fire_Shot(cible.Position);
+                                }
+                                else
+                                {
+                                    powerup = new PowerUp_Energy_Ball(cible.Position);
+                                }
+                            }
+                            this.listePowerUp.Add(powerup);
+                        }
                     }
                 }
             }
@@ -503,7 +660,7 @@ namespace projetJeu.Managers
                     this.CreerExplosion(vaisseauJoueur, this.particulesExplosions, gameTime, 0.5f);
                     // Détruire la cible et l'obus.
                     //this.listeEnnemis.Remove(cible);
-                    obusFini.Add(obus);
+                    listeObusFini.Add(obus);
 
                     if (vaisseauJoueur.Health < 1)
                     {
@@ -519,7 +676,7 @@ namespace projetJeu.Managers
             }
 
             // Se débarasser des obus n'étant plus d'aucune utilité.
-            foreach (Obus obus in obusFini)
+            foreach (Obus obus in listeObusFini)
             {
                 if (obus.Source == vaisseauJoueur)
                 {
@@ -543,6 +700,67 @@ namespace projetJeu.Managers
             }
         }
 
+        protected void UpdatePowerUps(GameTime gameTime)
+        {
+            foreach (PowerUp p in listePowerUp)
+            {
+                if (p.Position.X + p.Width > this.graphics.GraphicsDevice.Viewport.Width ||
+                    p.Position.X < 0 ||
+                    p.Position.Y < 0 ||
+                    p.Position.Y - p.Height > this.graphics.GraphicsDevice.Viewport.Height)
+                {
+                    listePowerUpFini.Add(p);
+                }
+            }
+
+            foreach (PowerUp p in listePowerUp)
+            {
+                if (p.Collision(vaisseauJoueur))
+                {
+                    pickupSound.Play(0.5f, 0f, 0f);
+                    listePowerUpFini.Add(p);
+                    ActivatePowerUp(p);
+                }
+            }
+
+            foreach (PowerUp p in listePowerUpFini)
+            {
+                listePowerUp.Remove(p);
+            }
+
+            foreach (PowerUp p in listePowerUp)
+            {
+                p.Update(gameTime, graphics);
+            }
+        }
+
+        private void ActivatePowerUp(PowerUp p)
+        {
+            if (p is PowerUp_Energy_Ball)
+            {
+                vaisseauJoueur.ProjectileType = ProjectileType.blueEnergyBall;
+            }
+            else if (p is PowerUp_Fire_Shot)
+            {
+                vaisseauJoueur.ProjectileType = ProjectileType.smallFireShot;
+            }
+            else if (p is PowerUp_One_Projectile)
+            {
+                vaisseauJoueur.ProjectileCount = 1;
+            }
+            else if (p is PowerUp_Two_Projectile)
+            {
+                vaisseauJoueur.ProjectileCount = 2;
+            }
+            else if (p is PowerUp_Three_Projectile)
+            {
+                vaisseauJoueur.ProjectileCount = 3;
+            }
+        }
+
+        /// <summary>
+        /// Dessine note jeu
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public void Draw(GameTime gameTime)
         {
             this.graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
@@ -568,9 +786,18 @@ namespace projetJeu.Managers
 
                 // Afficher l'arrière-plan.
                 this.arrierePlanEspace.Draw(0f, this.camera, this.spriteBatch);
+
+                foreach (PowerUp p in listePowerUp)
+                {
+                    p.Draw(0f, this.camera, this.spriteBatch);
+                }
+
                 // Afficher le sprite contrôlé par le joueur.
-                this.vaisseauJoueur.Draw(0f, this.camera, this.spriteBatch);
-                this.vaisseauJoueur.DrawHealth(this.spriteBatch);
+                if (this.vaisseauJoueur != null)
+                {
+                    this.vaisseauJoueur.Draw(0f, this.camera, this.spriteBatch);
+                    this.vaisseauJoueur.DrawHealth(this.spriteBatch);
+                }
 
                 foreach (Obus obus in listeObusJoueur)
                 {
@@ -595,14 +822,19 @@ namespace projetJeu.Managers
                     particule.Draw(0f, this.camera, this.spriteBatch);
                 }
 
-                string points = "Point : " + (point + pointAutre);
-                string vies = "Vies : " + vaisseauJoueur.NbVies;
-
+                string points = (!this.gameOver ? "Points    : " : "Points: ") + (this.points + pointsAutre);
+                string vies = "";
+                if (this.vaisseauJoueur != null)
+                {
+                    vies = "Vies       : " + vaisseauJoueur.NbVies;
+                }
+                string difficulté = "Difficultée : " + ((int)(this.probEnnemis / 0.005f)) + "x";
 
                 if (!gameOver)
                 {
                     spriteBatch.DrawString(policePetit, points, new Vector2(5, 5), Color.DarkCyan);
-                    spriteBatch.DrawString(policePetit, vies, new Vector2(9, 25), Color.DarkCyan);
+                    spriteBatch.DrawString(policePetit, vies, new Vector2(5, 25), Color.DarkCyan);
+                    spriteBatch.DrawString(policePetit, difficulté, new Vector2(5, 45), Color.DarkCyan);
                 }
                 else
                 {
@@ -628,6 +860,9 @@ namespace projetJeu.Managers
             this.spriteBatch.End();
         }
 
+        /// <summary>
+        /// Mise à jour des particules d'explosions
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected void UpdateParticulesExplosions(GameTime gameTime)
         {
             // Liste de particules à détruire
@@ -653,6 +888,9 @@ namespace projetJeu.Managers
             }
         }
 
+        /// <summary>
+        /// Mise à jour des ennemis
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected void updateEnnemi(GameTime gameTime)
         {
             // Identifier les ennemis ayant quitté l'écran.
@@ -691,8 +929,10 @@ namespace projetJeu.Managers
                 ennemi.GetAngleToPlayer += AngleToPlayer;
 
                 // Positionner aléatoirement le sprite au haut de l'écran.
-                ennemi.Position = new Vector2(this.graphics.GraphicsDevice.Viewport.Width + ennemi.Width / 2,
-                random.Next(this.graphics.GraphicsDevice.Viewport.Height));
+                do {
+                    ennemi.Position = new Vector2(this.graphics.GraphicsDevice.Viewport.Width + ennemi.Width / 2,
+                    random.Next(ennemi.Height, this.graphics.GraphicsDevice.Viewport.Height - ennemi.Height));
+                } while (EnnemiSpawnError(ennemi));
 
                 // Aligner la vitesse de déplacement de l'ennemi avec celui de l'arrière-plan.
                 ennemi.VitesseDeplacement = this.arrierePlanEspace.VitesseArrierePlan;
@@ -700,6 +940,17 @@ namespace projetJeu.Managers
                 // Ajouter le sprite à la liste d'ennemis.
                 this.listeEnnemis.Add(ennemi);
             }
+        }
+
+        private bool EnnemiSpawnError(EnnemiSprite ennemi) {
+            bool error = false;
+            foreach(EnnemiSprite e in listeEnnemis) {
+                if (e.Collision(ennemi)) {
+                    error = true;
+                    break;
+                }
+            }
+            return error;
         }
 
         /// <summary>
@@ -761,6 +1012,9 @@ namespace projetJeu.Managers
             }
         }
 
+        /// <summary>
+        /// On change d'état en faisant un fadeout
+        /// <param name="etat">Prochain etat</param>
         public void FadeOut(Etats etat)
         {
             nextEtatJeu = etat;
@@ -769,6 +1023,12 @@ namespace projetJeu.Managers
             fading = true;
         }
 
+        /// <summary>
+        /// Créer une explosion aux sprite choisi
+        /// <param name="sprite">Sprite cible</param>
+        /// <param name="particleTexture">Texture de la particule.</param>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        /// <param name="grosseur">Grosseur de l'explosion</param>
         private List<ParticuleExplosion> CreerExplosion(Sprite sprite, Texture2D particuleTexture, GameTime gameTime, float grosseur)
         {
             // Liste des nouvelles particules
@@ -793,6 +1053,9 @@ namespace projetJeu.Managers
             return nouvellesParticules;
         }
 
+        /// <summary>
+        /// Get angle to the player
+        /// <param name="source">Sprite cible</param>
         public float AngleToPlayer(Sprite source)
         {
             float angle = (float)Math.Atan2(source.Position.Y - this.vaisseauJoueur.Position.Y, source.Position.X - this.vaisseauJoueur.Position.X);

@@ -59,12 +59,39 @@ namespace projetJeu
         public delegate void Shoot(Obus obus, bool isPlayer = true);
 
         private ProjectileType projectileType = ProjectileType.smallFireShot;
-        private int projectileCount = 3;
-        public bool IsRespawned = false;
+        public ProjectileType ProjectileType
+        {
+            get { return projectileType; }
+            set { projectileType = value; }
+        }
+
+        private int projectileCount = 1;
+        public int ProjectileCount
+        {
+            get { return this.projectileCount; }
+            set { this.projectileCount = value; }
+        }
+
+        private bool isRespawned = false;
+
+        public bool IsRespawned
+        {
+            get { return isRespawned; }
+            set { isRespawned = value; }
+        }
+
         private float projectileAngle = 0.0f;
+
         private Texture2D previousTexture;
-        public Vector2 PositionInitiale;
+
+        private Vector2 positionInitiale;
+        public Vector2 PositionInitiale {
+            get { return this.positionInitiale; }
+            set { this.positionInitiale = value; }
+        }
+
         private float health;
+
         private int nbVies = 1;
 
         public int NbVies

@@ -60,6 +60,12 @@
     <Compile Include="IFM20884\ItemDeMenu.cs" />
     <Compile Include="IFM20884\Menu.cs" />
     <Compile Include="ParticuleExplosion.cs" />
+    <Compile Include="PowerUps\PowerUp-One-Projectile.cs" />
+    <Compile Include="PowerUps\PowerUp-Three-Projectile.cs" />
+    <Compile Include="PowerUps\PowerUp-Two-Projectile.cs" />
+    <Compile Include="PowerUps\PowerUp-Energy-Ball.cs" />
+    <Compile Include="PowerUps\PowerUp-Fire-Shot.cs" />
+    <Compile Include="PowerUps\PowerUp.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -99,6 +105,22 @@
     <Content Include="Content\Pipeline\SoundFX\explosion001.wav" />
     <Content Include="Content\Pipeline\SoundFX\menuitem_change.wav" />
     <Content Include="Content\Pipeline\SoundFX\misc291.wav" />
+    <Content Include="Content\Pipeline\SoundFX\pickup.wav" />
+    <Content Include="Content\Powerups\blue-energy-ball-powerup.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Powerups\one-projectile-powerup.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Powerups\small-fire-shot-powerup.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Powerups\three-projectile-powerup.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Powerups\two-projectile-powerup.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Projectiles\blue-energy-ball.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -126,7 +148,6 @@
     <Content Include="Icon.ico" />
     <Content Include="image\base3n.png" />
     <Content Include="image\WB_baseu3_d0.png" />
-    <Content Include="Travail.txt" />
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
